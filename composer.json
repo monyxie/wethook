@@ -1,0 +1,6 @@
+{
+    "require": {
+        "react/event-loop": "^0.4.3",
+        "react/http": "^0.8.0"
+    }
+}
