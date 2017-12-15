@@ -1,0 +1,14 @@
+<?php
+
+$BASEPATH = '/home/monyxie/code';
+
+return [
+    'gitcmd' => 'git',
+    'listen' => '0.0.0.0:8080',
+    'logfile' => PATH_WRITABLE . '/puller.log',
+    'password' => 'pwd',
+    'repos' => [
+        ['fullname' => 'oschina/webhook', 'path' => "$BASEPATH/example-repo"],
+        ['fullname' => 'oschina/webhook', 'path' => "$BASEPATH/example-repo1"],
+    ],
+];
