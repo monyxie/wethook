@@ -40,6 +40,11 @@ class Server {
      */
     public function run() {
         $server = new HttpServer(function (ServerRequestInterface $request) {
+            if (strtoupper($request->getMethod()) !== 'POST') {
+                return new Response(405, [], '405 Method Not Allowed');
+            }
+
+            $this->logger->write('接收到请求');
             $body = $this->handleRequest($request);
             return new Response(200, [], $body );
         });
@@ -48,7 +53,7 @@ class Server {
         $socket = new SocketServer($listen, $this->loop);
         $server->listen($socket);
 
-        $this->logger->write("Server running at http://{$listen}");
+        $this->logger->write("服务器正在以下地址上运行： http://{$listen}");
     }
 
     /**
@@ -87,30 +92,28 @@ class Server {
         $repos = $this->config->get('repos');
         foreach ($repos as $repo) {
             if ($repo['fullname'] === $repoName) {
-                $this->pull($repo['path']);
+                foreach ($repo['cmds'] as $cmd) {
+                    $this->runCommand($cmd, $repo['path']);
+                }
             }
         }
     }
 
     /**
-     * 拉取仓库
+     * 执行命令
      *
-     * @param $pathToRepo
+     * @param $cwd
      */
-    private function pull($pathToRepo) {
-
-        $gitCmdEscaped = escapeshellarg($this->config->get('gitcmd'));
-        $pathEscaped   = escapeshellarg($pathToRepo);
-        $cmd           = "$gitCmdEscaped -C $pathEscaped pull";
+    private function runCommand($cmd, $cwd) {
         $output        = '';
         $appendOutput  = function($chunk) use (&$output) {
             $output .= $chunk;
         };
-        $writeLog      = function() use ($pathToRepo, &$output) {
-            $this->logger->write("$pathToRepo : $output");
+        $writeLog      = function() use ($cwd, $cmd, &$output) {
+            $this->logger->write("[$cwd] ($cmd) $output");
         };
 
-        $process = new Process($cmd);
+        $process = new Process($cmd, $cwd);
         $process->start($this->loop);
         $process->stdout->on('data', $appendOutput);
         $process->stderr->on('data', $appendOutput);

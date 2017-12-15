@@ -1,14 +1,16 @@
 <?php
 
 $BASEPATH = '/home/monyxie/code';
+$GITPULL = 'git pull';
+$GITSTATUS = 'git status';
 
 return [
-    'gitcmd' => 'git',
     'listen' => '0.0.0.0:8080',
     'logfile' => PATH_WRITABLE . '/puller.log',
     'password' => 'pwd',
     'repos' => [
-        ['fullname' => 'oschina/webhook', 'path' => "$BASEPATH/example-repo"],
-        ['fullname' => 'oschina/webhook', 'path' => "$BASEPATH/example-repo1"],
+        ['fullname' => 'oschina/webhook', 'path' => "$BASEPATH/example-repo", 'cmds' => [$GITPULL, $GITSTATUS]],
+        ['fullname' => 'oschina/webhook', 'path' => "$BASEPATH/example-repo1", 'cmds' => [$GITPULL]],
+        ['fullname' => 'zxcv/api-user-zmeng', 'path' => "$BASEPATH/api-user-zmeng", 'cmds' => [$GITPULL]],
     ],
 ];

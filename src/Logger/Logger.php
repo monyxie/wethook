@@ -8,6 +8,6 @@ class Logger {
     }
 
     public function write($content) {
-        file_put_contents($this->logFile, date('Y-m-d H:i:s') . ' ' . $content . "\n", FILE_APPEND);
+        file_put_contents($this->logFile, date('Y-m-d H:i:s') . ' ' . trim($content, "\n") . "\n", FILE_APPEND);
     }
 }
