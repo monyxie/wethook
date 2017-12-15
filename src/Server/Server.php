@@ -11,6 +11,11 @@ use React\Http\Response;
 use React\Http\Server as HttpServer;
 use React\Socket\Server as SocketServer;
 
+/**
+ * Class Server
+ *
+ * @package Puller\Server
+ */
 class Server {
 
     /**
@@ -18,6 +23,9 @@ class Server {
      */
     private $loop;
 
+    /**
+     * Server constructor.
+     */
     function __construct() {
         $this->config = ConfigFactory::create();
         $this->logger = LoggerFactory::create();
@@ -27,14 +35,13 @@ class Server {
         $this->loop->run();
     }
 
+    /**
+     *
+     */
     public function run() {
         $server = new HttpServer(function (ServerRequestInterface $request) {
-            $this->handleRequest($request);
-            return new Response(
-                200,
-                array('Content-Type' => 'application/json'),
-                ''
-            );
+            $body = $this->handleRequest($request);
+            return new Response(200, [], $body );
         });
 
         $listen = $this->config->get('listen');
@@ -44,6 +51,11 @@ class Server {
         $this->logger->write("Server running at http://{$listen}");
     }
 
+    /**
+     * @param ServerRequestInterface $request
+     *
+     * @return string
+     */
     public function handleRequest(ServerRequestInterface $request) {
         try {
             $requestData = json_decode($request->getBody());
@@ -59,11 +71,18 @@ class Server {
             if ($requestData->hook_name === 'push_hooks') {
                 $this->handleRepoName($requestData->project->name_with_namespace);
             }
+
+            return 'OK';
         } catch (\Exception $e) {
             $this->logger->write($e->getMessage());
+            return 'FAIL';
         }
     }
 
+    /**
+     * 处理仓库名
+     * @param $repoName
+     */
     private function handleRepoName($repoName) {
         $repos = $this->config->get('repos');
         foreach ($repos as $repo) {
@@ -73,26 +92,29 @@ class Server {
         }
     }
 
-    private function pull($path) {
-        $gitCmdEscaped      = escapeshellarg($this->config->get('gitcmd'));
-        $pathEscaped = escapeshellarg($path);
-        $cmd         = "$gitCmdEscaped -C $pathEscaped pull";
+    /**
+     * 拉取仓库
+     *
+     * @param $pathToRepo
+     */
+    private function pull($pathToRepo) {
+
+        $gitCmdEscaped = escapeshellarg($this->config->get('gitcmd'));
+        $pathEscaped   = escapeshellarg($pathToRepo);
+        $cmd           = "$gitCmdEscaped -C $pathEscaped pull";
+        $output        = '';
+        $appendOutput  = function($chunk) use (&$output) {
+            $output .= $chunk;
+        };
+        $writeLog      = function() use ($pathToRepo, &$output) {
+            $this->logger->write("$pathToRepo : $output");
+        };
 
         $process = new Process($cmd);
         $process->start($this->loop);
-
-        $output = '';
-
-        $process->stdout->on('data', function($chunk) use (&$output) {
-            $output .= $chunk;
-        });
-        $process->stderr->on('data', function($chunk) use (&$output) {
-            $output .= $chunk;
-        });
-
-        $process->on('exit', function() use ($path, &$output) {
-            $this->logger->write("$path : $output");
-        });
+        $process->stdout->on('data', $appendOutput);
+        $process->stderr->on('data', $appendOutput);
+        $process->on('exit', $writeLog);
     }
 
 }
