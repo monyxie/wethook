@@ -1,16 +1,17 @@
 <?php
 
-$BASEPATH = '/home/monyxie/code';
-$GITPULL = 'git pull';
-$GITSTATUS = 'git status';
+$PATH_REPO_BASE = '/home/monyxie/code';
+$PATH_WRITABLE  = PATH_WRITABLE;
+$CMD_GIT_PULL   = 'git pull';
+$CMD_GIT_STATUS = 'git status';
 
 return [
-    'listen' => '0.0.0.0:8080',
-    'logfile' => PATH_WRITABLE . '/puller.log',
-    'password' => 'pwd',
-    'repos' => [
-        ['fullname' => 'oschina/webhook', 'path' => "$BASEPATH/example-repo", 'cmds' => [$GITPULL, $GITSTATUS]],
-        ['fullname' => 'oschina/webhook', 'path' => "$BASEPATH/example-repo1", 'cmds' => [$GITPULL]],
-        ['fullname' => 'zxcv/api-user-zmeng', 'path' => "$BASEPATH/api-user-zmeng", 'cmds' => [$GITPULL]],
+    'listen' => '0.0.0.0:8080', // 绑定地址和端口
+    'logfile' => $PATH_WRITABLE . '/puller.log', // 日志文件路径
+    'password' => 'pwd', // 请求密码
+    'repos' => [ // 仓库列表
+        ['fullname' => 'oschina/webhook', 'path' => $PATH_REPO_BASE . "/example-repo", 'cmds' => [$CMD_GIT_PULL]],
+        ['fullname' => 'oschina/webhook', 'path' => $PATH_REPO_BASE . "/example-repo1", 'cmds' => [$CMD_GIT_PULL]],
+        ['fullname' => 'zxcv/api-user-zmeng', 'path' => $PATH_REPO_BASE . "/api-user-zmeng", 'cmds' => [$CMD_GIT_PULL]],
     ],
 ];
