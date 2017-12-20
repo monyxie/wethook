@@ -12,7 +12,7 @@ abstract class ConfigFactory {
     /**
      * @return Config
      */
-    public static function create() {
+    public static function get() {
         static $instance;
         if (! $instance) {
             $instance = new Config(PATH_CONFIG . '/main.php');

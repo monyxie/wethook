@@ -3,13 +3,11 @@
 // 请将本文件复制为 main.php 再修改
 
 $PATH_REPO_BASE = '/home/monyxie/code';
-$PATH_WRITABLE  = PATH_WRITABLE;
 $CMD_GIT_PULL   = 'git pull';
 $CMD_GIT_STATUS = 'git status';
 
 return [
     'listen' => '0.0.0.0:8080', // 绑定地址和端口
-    'logfile' => $PATH_WRITABLE . '/puller.log', // 日志文件路径
     'password' => 'pwd', // 请求密码
     'repos' => [ // 仓库列表
         ['fullname' => 'oschina/webhook', 'path' => $PATH_REPO_BASE . "/example-repo", 'cmds' => [$CMD_GIT_PULL]],

@@ -27,8 +27,8 @@ class Server {
      * Server constructor.
      */
     function __construct() {
-        $this->config = ConfigFactory::create();
-        $this->logger = LoggerFactory::create();
+        $this->config = ConfigFactory::get();
+        $this->logger = LoggerFactory::get();
 
         $this->loop = Factory::create();
         $this->run();
@@ -66,22 +66,26 @@ class Server {
             $requestData = json_decode($request->getBody());
 
             if (! $requestData) {
-                throw new \Exception('请求主体不是有效的JSON');
+                $errorMessage = '请求主体不是有效的JSON';
             }
 
             if ($requestData->password !== $this->config->get('password')) {
-                throw new \Exception('请求密码无效');
+                $errorMessage = '请求密码无效';
             }
 
             if ($requestData->hook_name === 'push_hooks') {
                 $this->handleRepoName($requestData->project->name_with_namespace);
             }
-
-            return 'OK';
         } catch (\Exception $e) {
-            $this->logger->write($e->getMessage());
+            $errorMessage = $e->getMessage();
+        }
+
+        if (isset($errorMessage)) {
+            $this->logger->write($errorMessage);
             return 'FAIL';
         }
+
+        return 'OK';
     }
 
     /**

@@ -2,8 +2,6 @@
 
 namespace Puller\Logger;
 
-use Puller\Config\ConfigFactory;
-
 /**
  * Class LoggerFactory
  *
@@ -14,10 +12,10 @@ abstract class LoggerFactory {
     /**
      * @return Logger
      */
-    public static function create() {
+    public static function get() {
         static $instance;
         if (! $instance) {
-            $instance = new Logger(ConfigFactory::create()->get('logfile'));
+            $instance = new Logger(PATH_WRITABLE . '/puller.log');
         }
 
         return $instance;
