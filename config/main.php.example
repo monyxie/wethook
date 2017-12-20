@@ -3,7 +3,7 @@
 // 请将本文件复制为 main.php 再修改
 
 $PATH_REPO_BASE = '/home/monyxie/code';
-$CMD_GIT_PULL   = 'git pull';
+$CMD_GIT_PULL   = 'git pull --no-stat';
 $CMD_GIT_STATUS = 'git status';
 
 return [

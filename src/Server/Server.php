@@ -63,19 +63,36 @@ class Server {
      */
     public function handleRequest(ServerRequestInterface $request) {
         try {
-            $requestData = json_decode($request->getBody());
+            do {
+                $requestData = json_decode($request->getBody());
 
-            if (! $requestData) {
-                $errorMessage = '请求主体不是有效的JSON';
-            }
+                if (! $requestData) {
+                    $errorMessage = '请求主体不是有效的JSON';
+                    break;
+                }
 
-            if ($requestData->password !== $this->config->get('password')) {
-                $errorMessage = '请求密码无效';
-            }
+                $requiredFields = [
+                    'password',
+                    'hook_name',
+                    'project'
+                ];
+                foreach ($requiredFields as $field) {
+                    if (! isset($requestData->$field)) {
+                        $errorMessage = '请求缺少字段:' . $field;
+                        break 2;
+                    }
+                }
 
-            if ($requestData->hook_name === 'push_hooks') {
-                $this->handleRepoName($requestData->project->name_with_namespace);
-            }
+                if ($requestData->password !== $this->config->get('password')) {
+                    $errorMessage = '请求密码无效:' . $requestData->password;
+                    break;
+                }
+
+
+                if ($requestData->hook_name === 'push_hooks') {
+                    $this->handleRepoName($requestData->project->name_with_namespace);
+                }
+            } while (false);
         } catch (\Exception $e) {
             $errorMessage = $e->getMessage();
         }
