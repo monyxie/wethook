@@ -15,7 +15,7 @@ abstract class LoggerFactory {
     public static function get() {
         static $instance;
         if (! $instance) {
-            $instance = new Logger(PATH_WRITABLE . '/puller.log');
+            $instance = new Logger(PATH_WRITABLE . '/webhooked.log');
         }
 
         return $instance;
