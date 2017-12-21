@@ -88,16 +88,20 @@ class Server {
                     break;
                 }
 
-
                 if ($requestData->hook_name === 'push_hooks') {
-                    $this->handleRepoName($requestData->project->name_with_namespace);
+                    $errorMessage = $this->handleRepoName($requestData->project->name_with_namespace);
+                    break;
+                }
+                else {
+                    $errorMessage = '无法处理的钩子类型:' . $requestData->hook_name;
+                    break;
                 }
             } while (false);
         } catch (\Exception $e) {
             $errorMessage = $e->getMessage();
         }
 
-        if (isset($errorMessage)) {
+        if (! empty($errorMessage)) {
             $this->logger->write($errorMessage);
             return 'FAIL';
         }
@@ -107,17 +111,26 @@ class Server {
 
     /**
      * 处理仓库名
+     *
      * @param $repoName
+     *
+     * @return null|string 错误信息
      */
     private function handleRepoName($repoName) {
         $repos = $this->config->get('repos');
+
+        $matched = false;
         foreach ($repos as $repo) {
             if ($repo['fullname'] === $repoName) {
                 foreach ($repo['cmds'] as $cmd) {
                     $this->runCommand($cmd, $repo['path']);
                 }
+
+                $matched = true;
             }
         }
+
+        return $matched ? null : '没有匹配的仓库:' . $repoName;
     }
 
     /**
