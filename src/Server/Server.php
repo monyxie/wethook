@@ -122,10 +122,7 @@ class Server {
         $matched = false;
         foreach ($repos as $repo) {
             if ($repo['fullname'] === $repoName) {
-                foreach ($repo['cmds'] as $cmd) {
-                    $this->runCommand($cmd, $repo['path']);
-                }
-
+                $this->runCommands($repo['cmds'], $repo['path']);
                 $matched = true;
             }
         }
@@ -134,17 +131,39 @@ class Server {
     }
 
     /**
+     * @param $cmds
+     * @param $cwd
+     */
+    private function runCommands($cmds, $cwd) {
+
+        $resume = null;
+        $generatorMaker = function() use ($cmds, $cwd, &$resume) {
+            foreach ($cmds as $cmd) {
+                yield $this->runCommand($cmd, $cwd, $resume);
+            }
+        };
+
+        $generator = $generatorMaker();
+        $resume = function() use ($generator) {
+            $generator->next();
+        };
+
+        $generator->current();
+    }
+
+    /**
      * 执行命令
      *
      * @param $cwd
      */
-    private function runCommand($cmd, $cwd) {
+    private function runCommand($cmd, $cwd, $onExit) {
         $output        = '';
         $appendOutput  = function($chunk) use (&$output) {
             $output .= $chunk;
         };
-        $writeLog      = function() use ($cwd, $cmd, &$output) {
+        $writeLog      = function() use ($cwd, $cmd, $onExit, &$output) {
             $this->logger->write("[$cwd] ($cmd) $output");
+            call_user_func($onExit);
         };
 
         $process = new Process($cmd, $cwd);
