@@ -15,7 +15,7 @@ abstract class ConfigFactory {
     public static function get() {
         static $instance;
         if (! $instance) {
-            $instance = new Config(PATH_CONFIG . '/main.php');
+            $instance = new Config(PATH_CONFIG . '/config.json');
         }
 
         return $instance;

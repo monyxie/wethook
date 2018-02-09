@@ -1,0 +1,13 @@
+{
+  "listen": "0.0.0.0:8080",
+  "password": "secret",
+  "repos": [
+    {
+      "name": "monyxie/webhooked",
+      "path": "/home/monyxie/code/webhooked",
+      "commands": [
+        "git pull"
+      ]
+    }
+  ]
+}

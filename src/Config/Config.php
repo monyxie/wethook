@@ -15,7 +15,7 @@ class Config {
      * @param $path
      */
     public function __construct($path) {
-        $this->data = require($path);
+        $this->data = json_decode(file_get_contents($path), true);
     }
 
     /**

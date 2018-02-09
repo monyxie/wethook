@@ -121,8 +121,8 @@ class Server {
 
         $matched = false;
         foreach ($repos as $repo) {
-            if ($repo['fullname'] === $repoName) {
-                $this->runCommands($repo['cmds'], $repo['path']);
+            if ($repo['name'] === $repoName) {
+                $this->runCommands($repo['commands'], $repo['path']);
                 $matched = true;
             }
         }
