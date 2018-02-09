@@ -1,10 +1,10 @@
 <?php
 
-namespace Puller\Server;
+namespace Monyxie\Webhooked\Server;
 
 use Psr\Http\Message\ServerRequestInterface;
-use Puller\Config\ConfigFactory;
-use Puller\Logger\LoggerFactory;
+use Monyxie\Webhooked\Config\ConfigFactory;
+use Monyxie\Webhooked\Logger\LoggerFactory;
 use React\ChildProcess\Process;
 use React\EventLoop\Factory;
 use React\Http\Response;
@@ -14,7 +14,7 @@ use React\Socket\Server as SocketServer;
 /**
  * Class Server
  *
- * @package Puller\Server
+ * @package Monyxie\Webhooked\Server
  */
 class Server {
 

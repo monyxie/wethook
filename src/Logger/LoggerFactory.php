@@ -1,11 +1,11 @@
 <?php
 
-namespace Puller\Logger;
+namespace Monyxie\Webhooked\Logger;
 
 /**
  * Class LoggerFactory
  *
- * @package Puller\Logger
+ * @package Monyxie\Webhooked\Logger
  */
 abstract class LoggerFactory {
 

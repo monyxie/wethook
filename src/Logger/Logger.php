@@ -1,6 +1,6 @@
 <?php
 
-namespace Puller\Logger;
+namespace Monyxie\Webhooked\Logger;
 
 class Logger {
     public function __construct($pathToLogFile) {

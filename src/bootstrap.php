@@ -7,5 +7,5 @@ define('PATH_SRC', PATH_ROOT . '/src');
 define('PATH_CONFIG', PATH_ROOT . '/config');
 define('PATH_RUNTIME', PATH_ROOT . '/runtime');
 
-$server = new \Puller\Server\Server();
+$server = new \Monyxie\Webhooked\Server\Server();
 $server->run();

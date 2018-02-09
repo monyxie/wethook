@@ -1,11 +1,11 @@
 <?php
 
-namespace Puller\Config;
+namespace Monyxie\Webhooked\Config;
 
 /**
  * Class ConfigFactory
  *
- * @package Puller\Config
+ * @package Monyxie\Webhooked\Config
  */
 abstract class ConfigFactory {
 
