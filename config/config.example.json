@@ -1,12 +1,15 @@
 {
   "listen": "0.0.0.0:8080",
-  "password": "secret",
+  "password": "global-secret",
   "repos": [
     {
       "name": "monyxie/webhooked",
-      "path": "/home/monyxie/code/webhooked",
-      "commands": [
-        "git pull"
+      "password": "repo-specific-secret",
+      "tasks": [
+        {
+          "chdir": "/home/monyxie/code/webhooked",
+          "commands": [ "git pull" ]
+        }
       ]
     }
   ]

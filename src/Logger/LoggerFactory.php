@@ -10,12 +10,15 @@ namespace Monyxie\Webhooked\Logger;
 abstract class LoggerFactory {
 
     /**
-     * @return Logger
+     * @return LoggerInterface
      */
     public static function get() {
         static $instance;
         if (! $instance) {
-            $instance = new Logger(PATH_RUNTIME . '/webhooked.log');
+            $instance = new CompositeLogger([
+                new FileLogger(PATH_RUNTIME . '/webhooked.log'),
+                new ConsoleLogger(),
+            ]);
         }
 
         return $instance;
