@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: monyxie
- * Date: 18-3-28
- * Time: 下午10:41
- */
 
 namespace Monyxie\Webhooked\Server;
 
@@ -13,7 +7,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use React\Http\Response;
 
 /**
- * Class Router
+ * Route HTTP requests.
  * @package Monyxie\Webhooked\Server
  */
 class Router {
