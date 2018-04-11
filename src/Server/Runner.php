@@ -10,7 +10,7 @@ use React\EventLoop\LoopInterface;
 use React\Http\Response;
 
 /**
- * Class Runner
+ * Run commands base on request and config.
  * @package Monyxie\Webhooked\Server
  */
 class Runner extends EventEmitter
