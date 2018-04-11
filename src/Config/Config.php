@@ -22,6 +22,7 @@ class Config {
      * @param $key
      *
      * @return mixed
+     * @throws ConfigKeyNotFoundException
      */
     public function get($key) {
         $keys = explode('.', $key);
@@ -29,7 +30,7 @@ class Config {
         $value = $this->data;
         foreach ($keys as $item) {
             if (! isset($value[$item])) {
-                throw new \Exception('找不到配置项: ' . $key);
+                throw new ConfigKeyNotFoundException('找不到配置项: ' . $key);
             }
             $value = $value[$item];
         }
