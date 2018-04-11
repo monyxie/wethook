@@ -24,17 +24,25 @@ class GiteeRequest implements BasicRequestInterface
      */
     private $eventName;
 
+    /**
+     * GiteeRequest constructor.
+     * @param ServerRequestInterface $request
+     * @throws MalformedRequestException
+     */
     public function __construct(ServerRequestInterface $request)
     {
 
         $bodyData = json_decode($request->getBody());
 
-        if ($bodyData === null || !isset($bodyData->password) || !isset($bodyData->project->path_with_namespace)) {
+        if ($bodyData === null || !isset($bodyData->password) || !isset($bodyData->project->path_with_namespace) || !isset($bodyData->hook_name)) {
             throw new MalformedRequestException();
         }
 
         $this->secret = $bodyData->password;
         $this->repositoryFullName = $bodyData->project->path_with_namespace;
+
+        // only deal with push hooks for now
+        $this->eventName = $bodyData->hook_name === 'push_hooks' ? 'push' : $bodyData->hook_name;
     }
 
     public function validateSecret(string $secret): bool
