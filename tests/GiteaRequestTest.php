@@ -35,7 +35,7 @@ class GiteaRequestTest extends \PHPUnit\Framework\TestCase {
         $httpRequest->expects($this->once())
             ->method('getHeader')
             ->with('X-Gitea-Event')
-            ->willReturn([ 'push' ]);
+            ->willReturn([ static::EVENT_NAME ]);
 
         $giteaRequest = new GiteaRequest($httpRequest);
         $this->assertInstanceOf(
@@ -64,17 +64,19 @@ class GiteaRequestTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * @depends testCanBeCreatedFromWellFormedHttpRequest
-     * @param $giteaRequest
+     * @param GiteaRequest $giteaRequest
      */
-    public function testValidateSecretShouldReturnTrueForCorrectSecret($giteaRequest) {
+    public function testValidateSecret($giteaRequest) {
         $this->assertTrue($giteaRequest->validateSecret(self::SECRET));
+        $this->assertFalse($giteaRequest->validateSecret(self::SECRET . '#'));
+        $this->assertFalse($giteaRequest->validateSecret(''));
     }
 
     /**
      * @depends testCanBeCreatedFromWellFormedHttpRequest
-     * @param $giteaRequest
+     * @param GiteaRequest $giteaRequest
      */
-    public function testValidateSecretShouldReturnFalseForIncorrectSecret($giteaRequest) {
-        $this->assertFalse($giteaRequest->validateSecret(self::SECRET . '#'));
+    public function testGetEventName($giteaRequest) {
+        $this->assertTrue($giteaRequest->getEventName() === static::EVENT_NAME);
     }
 }

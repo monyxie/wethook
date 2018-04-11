@@ -23,6 +23,11 @@ class GiteaRequest implements BasicRequestInterface {
      */
     private $eventName;
 
+    /**
+     * GiteaRequest constructor.
+     * @param ServerRequestInterface $request
+     * @throws MalformedRequestException
+     */
     public function __construct(ServerRequestInterface $request) {
 
         $bodyData = json_decode($request->getBody());
@@ -41,7 +46,7 @@ class GiteaRequest implements BasicRequestInterface {
 
         $this->secret = $bodyData->secret;
         $this->repositoryFullName = $bodyData->repository->full_name;
-        $this->event = $event;
+        $this->eventName = $event;
     }
 
     public function validateSecret(string $secret): bool {
@@ -52,8 +57,7 @@ class GiteaRequest implements BasicRequestInterface {
         return $this->repositoryFullName;
     }
 
-    public function getEventName(): string
-    {
+    public function getEventName(): string {
         return $this->eventName;
     }
 }
