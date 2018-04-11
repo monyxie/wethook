@@ -120,11 +120,11 @@ class Runner extends EventEmitter
             'cwd' => $cwd,
         ]);
 
-        $output        = '';
-        $appendOutput  = function($chunk) use (&$output) {
+        $output = '';
+        $appendOutput = function($chunk) use (&$output) {
             $output .= $chunk;
         };
-        $handleProcessExit      = function() use ($that, $cwd, $command, $onExit, &$output) {
+        $handleProcessExit = function() use ($that, $cwd, $command, $onExit, &$output) {
             $that->emit(static::EVENT_AFTER_COMMAND, [
                 $command,
                 $cwd,
