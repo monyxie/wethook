@@ -86,7 +86,7 @@ class Server {
         $listenAddress = $this->config->get('listen');
         $server->listen(new SocketServer($listenAddress, $this->loop));
 
-        $this->logger->write("Server started at： http://{$listenAddress}");
+        $this->logger->write("Server started at http://{$listenAddress}");
         $this->loop->run();
     }
 

@@ -111,8 +111,8 @@ class Runner extends EventEmitter
      * @param $command
      * @param $cwd
      * @param $onExit
-     * @throws \React\ChildProcess\LogicException
-     * @throws \React\ChildProcess\RuntimeException
+     * @throws \LogicException
+     * @throws \RuntimeException
      */
     private function runCommand($command, $cwd, $onExit) {
         $that = $this;
