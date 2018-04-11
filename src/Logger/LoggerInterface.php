@@ -14,8 +14,9 @@ namespace Monyxie\Webhooked\Logger;
  */
 interface LoggerInterface {
     /**
+     * Write log.
      * @param string $content
-     * @return mixed
+     * @return void
      */
     public function write(string $content);
 }
