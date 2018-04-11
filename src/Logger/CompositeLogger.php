@@ -8,7 +8,7 @@ namespace Monyxie\Webhooked\Logger;
  */
 class CompositeLogger implements LoggerInterface {
     /**
-     * @var array
+     * @var LoggerInterface[]
      */
     private $loggers;
 
@@ -18,7 +18,7 @@ class CompositeLogger implements LoggerInterface {
 
     public function write(string $content) {
         foreach ($this->loggers as $logger) {
-            call_user_func([$logger, 'write'], $content);
+            $logger->write($content);
         }
     }
 }
