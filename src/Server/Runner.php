@@ -1,13 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: monyxie
- * Date: 18-3-28
- * Time: 下午11:15
- */
 
 namespace Monyxie\Webhooked\Server;
-
 
 use Evenement\EventEmitter;
 use Monyxie\Webhooked\Config\Config;
@@ -39,6 +32,11 @@ class Runner extends EventEmitter
         $this->config = $config;
     }
 
+    /**
+     * @param BasicRequestInterface $request
+     * @return string
+     * @throws \Monyxie\Webhooked\Config\ConfigKeyNotFoundException
+     */
     public function run(BasicRequestInterface $request) {
         return $this->handleRequest($request);
     }
@@ -47,6 +45,7 @@ class Runner extends EventEmitter
      * @param BasicRequestInterface $request
      *
      * @return string
+     * @throws \Monyxie\Webhooked\Config\ConfigKeyNotFoundException
      */
     public function handleRequest(BasicRequestInterface $request) {
         if (! $request->validateSecret($this->config->get('password'))) {
@@ -69,6 +68,7 @@ class Runner extends EventEmitter
      * @param $repoName
      *
      * @return null|string 错误信息
+     * @throws \Monyxie\Webhooked\Config\ConfigKeyNotFoundException
      */
     private function handleRepoName($repoName) {
         $repos = $this->config->get('repos');
@@ -111,6 +111,8 @@ class Runner extends EventEmitter
      * @param $command
      * @param $cwd
      * @param $onExit
+     * @throws \React\ChildProcess\LogicException
+     * @throws \React\ChildProcess\RuntimeException
      */
     private function runCommand($command, $cwd, $onExit) {
         $that = $this;
