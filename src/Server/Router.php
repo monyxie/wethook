@@ -44,9 +44,9 @@ class Router {
             return call_user_func($this->routes[$path][$method], $request);
         }
         else if (isset($this->routes[$path])) {
-            return new Response(405, [], 'Error 405 : Method Not Allowed.');
+            return new Response(405, [], '405 Method Not Allowed.');
         }
 
-        return new Response(404, [], 'Error 404 : Not Found.');
+        return new Response(404, [], '404 Not Found.');
     }
 }

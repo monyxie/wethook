@@ -81,7 +81,7 @@ class Runner extends EventEmitter
             }
         }
 
-        return $matched ? null : 'No matching repository found : ' . $repoName;
+        return $matched ? 'OK' : 'No matching repository found : ' . $repoName;
     }
 
     /**
@@ -126,9 +126,9 @@ class Runner extends EventEmitter
         };
         $handleProcessExit      = function() use ($that, $cwd, $command, $onExit, &$output) {
             $that->emit(static::EVENT_AFTER_COMMAND, [
-                'command' => $command,
-                'cwd' => $cwd,
-                'stdout' => $output,
+                $command,
+                $cwd,
+                $output,
             ]);
             return call_user_func($onExit);
         };

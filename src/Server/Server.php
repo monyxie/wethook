@@ -58,8 +58,8 @@ class Server {
         $this->router->register('POST', '/gitee', $this->getHandlerForRequestClass(GiteeRequest::class));
 
         $this->runner = new Runner($this->loop, $this->config);
-        $this->runner->on(Runner::EVENT_AFTER_COMMAND, function ($data) use ($that) {
-            $that->logger->write("[{$data['cwd']}] ({$data['command']}) {$data['stdout']}");
+        $this->runner->on(Runner::EVENT_AFTER_COMMAND, function ($command, $cwd, $output) use ($that) {
+            $that->logger->write("[{$cwd}] ({$command}) {$output}");
         });
     }
 
@@ -97,7 +97,7 @@ class Server {
                 $request = new $requestClass($httpRequest);
             }
             catch (MalformedRequestException $e) {
-                return new Response(400);
+                return new Response(400, [], '400 Bad request.');
             }
 
             $body = $this->runner->run($request);
