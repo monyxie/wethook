@@ -1,15 +1,16 @@
 {
   "listen": "0.0.0.0:8080",
-  "password": "global-secret",
+  "password": "secret",
   "repos": [
     {
       "name": "monyxie/webhooked",
-      "password": "repo-specific-secret",
-      "tasks": [
-        {
-          "chdir": "/home/monyxie/code/webhooked",
-          "commands": [ "git pull" ]
-        }
+      "directories": [
+        "/var/www/html/webhooked-1",
+        "/var/www/html/webhooked-2"
+      ],
+      "commands": [
+        "git pull",
+        "npm run build"
       ]
     }
   ]

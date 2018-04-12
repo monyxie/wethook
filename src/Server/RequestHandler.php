@@ -64,10 +64,18 @@ class RequestHandler extends EventEmitter
 
         $matched = false;
         foreach ($repos as $repo) {
-            if ($repo['name'] === $repoName) {
-                $this->runCommands($repo['commands'], $repo['path']);
-                $matched = true;
+            $isMatch = $repoName === $repo['name'];
+
+            if (! $isMatch) {
+                continue;
             }
+
+            $directories = is_array($repo['directories']) ? $repo['directories'] : [$repo['directories']];
+            foreach ($directories as $directory) {
+                $this->runCommands($repo['commands'], $directory);
+            }
+
+            $matched = true;
         }
 
         return $matched ? 'OK' : 'No matching repository found : ' . $repoName;

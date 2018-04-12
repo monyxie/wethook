@@ -59,7 +59,8 @@ class Server {
 
         $this->requestHandler = new RequestHandler($this->loop, $this->config);
         $this->requestHandler->on(RequestHandler::EVENT_AFTER_COMMAND, function ($command, $cwd, $output) use ($that) {
-            $that->logger->write("[{$cwd}] ({$command}) {$output}");
+            $command = var_export($command, true);
+            $that->logger->write("<{$cwd}> {$command} {$output}");
         });
     }
 
@@ -100,7 +101,7 @@ class Server {
                 return new Response(400, [], '400 Bad request.');
             }
 
-            $body = $this->requestHandler->run($request);
+            $body = $this->requestHandler->handle($request);
             return new Response(200, [], $body);
         };
     }
