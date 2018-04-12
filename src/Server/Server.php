@@ -6,6 +6,11 @@ use Evenement\EventEmitter;
 use Monyxie\Webhooked\Request\Gitea\GiteaRequest;
 use Monyxie\Webhooked\Request\Gitee\GiteeRequest;
 use Monyxie\Webhooked\Request\MalformedRequestException;
+use Monyxie\Webhooked\Server\Command\CommandExecutor;
+use Monyxie\Webhooked\Server\Command\CommandQueueManager;
+use Monyxie\Webhooked\Server\Command\InvalidSecretException;
+use Monyxie\Webhooked\Server\Command\RequestCommandsMapper;
+use Monyxie\Webhooked\Server\Command\UnsupportedEventException;
 use Psr\Http\Message\ServerRequestInterface;
 use Monyxie\Webhooked\Config\ConfigFactory;
 use Monyxie\Webhooked\Logger\LoggerFactory;
@@ -31,9 +36,9 @@ class Server {
      */
     private $router;
     /**
-     * @var RequestHandler
+     * @var RequestCommandsMapper
      */
-    private $requestHandler;
+    private $mapper;
     /**
      * @var \Monyxie\Webhooked\Config\Config
      */
@@ -42,6 +47,10 @@ class Server {
      * @var \Monyxie\Webhooked\Logger\LoggerInterface
      */
     private $logger;
+    /**
+     * @var CommandQueueManager
+     */
+    private $manager;
 
     /**
      * Server constructor.
@@ -54,11 +63,13 @@ class Server {
         $this->loop = Factory::create();
 
         $this->router = new Router();
-        $this->router->register('POST', '/gitea', $this->getHandlerForRequestClass(GiteaRequest::class));
-        $this->router->register('POST', '/gitee', $this->getHandlerForRequestClass(GiteeRequest::class));
+        $this->router->register('POST', '/gitea', $this->createHandlerForRequestClass(GiteaRequest::class));
+        $this->router->register('POST', '/gitee', $this->createHandlerForRequestClass(GiteeRequest::class));
 
-        $this->requestHandler = new RequestHandler($this->loop, $this->config);
-        $this->requestHandler->on(RequestHandler::EVENT_AFTER_COMMAND, function ($command, $cwd, $output) use ($that) {
+        $this->mapper = new RequestCommandsMapper($this->config);
+
+        $this->manager = new CommandQueueManager($this->loop);
+        $this->manager->on(CommandExecutor::EVENT_AFTER_COMMAND, function ($command, $cwd, $output) use ($that) {
             $command = var_export($command, true);
             $that->logger->write("<{$cwd}> {$command} {$output}");
         });
@@ -91,7 +102,7 @@ class Server {
         $this->loop->run();
     }
 
-    private function getHandlerForRequestClass(string $requestClass) {
+    private function createHandlerForRequestClass(string $requestClass) {
         $that = $this;
         return function (ServerRequestInterface $httpRequest) use ($that, $requestClass) {
             try {
@@ -101,8 +112,25 @@ class Server {
                 return new Response(400, [], '400 Bad request.');
             }
 
-            $body = $this->requestHandler->handle($request);
-            return new Response(200, [], $body);
+            try {
+                $commands = $this->mapper->map($request);
+            }
+            catch (InvalidSecretException $e) {
+                return new Response(400, [], 'Invalid secret');
+            }
+            catch (UnsupportedEventException $e) {
+                return new Response(400, [], 'Unsupported event');
+            }
+
+            if (! $commands) {
+                return new Response(200, [], 'OK, but there\'s no commands defined for this repo');
+            }
+
+            foreach ($commands as $command) {
+                $this->manager->enqueue($command);
+            }
+
+            return new Response(200, [], 'OK, ' . count($commands) . ' command(s) queued');
         };
     }
 }
