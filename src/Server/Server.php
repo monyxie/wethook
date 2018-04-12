@@ -2,7 +2,6 @@
 
 namespace Monyxie\Webhooked\Server;
 
-use Evenement\EventEmitter;
 use Monyxie\Webhooked\Request\Gitea\GiteaRequest;
 use Monyxie\Webhooked\Request\Gitee\GiteeRequest;
 use Monyxie\Webhooked\Request\MalformedRequestException;
