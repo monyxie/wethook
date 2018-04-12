@@ -31,9 +31,9 @@ class Server {
      */
     private $router;
     /**
-     * @var Runner
+     * @var RequestHandler
      */
-    private $runner;
+    private $requestHandler;
     /**
      * @var \Monyxie\Webhooked\Config\Config
      */
@@ -57,8 +57,8 @@ class Server {
         $this->router->register('POST', '/gitea', $this->getHandlerForRequestClass(GiteaRequest::class));
         $this->router->register('POST', '/gitee', $this->getHandlerForRequestClass(GiteeRequest::class));
 
-        $this->runner = new Runner($this->loop, $this->config);
-        $this->runner->on(Runner::EVENT_AFTER_COMMAND, function ($command, $cwd, $output) use ($that) {
+        $this->requestHandler = new RequestHandler($this->loop, $this->config);
+        $this->requestHandler->on(RequestHandler::EVENT_AFTER_COMMAND, function ($command, $cwd, $output) use ($that) {
             $that->logger->write("[{$cwd}] ({$command}) {$output}");
         });
     }
@@ -100,7 +100,7 @@ class Server {
                 return new Response(400, [], '400 Bad request.');
             }
 
-            $body = $this->runner->run($request);
+            $body = $this->requestHandler->run($request);
             return new Response(200, [], $body);
         };
     }

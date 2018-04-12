@@ -13,7 +13,7 @@ use React\Http\Response;
  * Run commands base on request and config.
  * @package Monyxie\Webhooked\Server
  */
-class Runner extends EventEmitter
+class RequestHandler extends EventEmitter
 {
     const EVENT_BEFORE_COMMAND = 'beforeCommand';
     const EVENT_AFTER_COMMAND = 'afterCommand';
@@ -34,20 +34,11 @@ class Runner extends EventEmitter
 
     /**
      * @param BasicRequestInterface $request
-     * @return string
-     * @throws \Monyxie\Webhooked\Config\ConfigKeyNotFoundException
-     */
-    public function run(BasicRequestInterface $request) {
-        return $this->handleRequest($request);
-    }
-
-    /**
-     * @param BasicRequestInterface $request
      *
      * @return string
      * @throws \Monyxie\Webhooked\Config\ConfigKeyNotFoundException
      */
-    public function handleRequest(BasicRequestInterface $request) {
+    public function handle(BasicRequestInterface $request) {
         if (! $request->validateSecret($this->config->get('password'))) {
             return 'Invalid secret';
         }
@@ -63,11 +54,9 @@ class Runner extends EventEmitter
     }
 
     /**
-     * 处理仓库名
-     *
      * @param $repoName
      *
-     * @return null|string 错误信息
+     * @return string Response body
      * @throws \Monyxie\Webhooked\Config\ConfigKeyNotFoundException
      */
     private function handleRepoName($repoName) {
@@ -85,6 +74,7 @@ class Runner extends EventEmitter
     }
 
     /**
+     * Run multiple commands sequentially
      * @param $commands
      * @param $cwd
      */
@@ -106,7 +96,7 @@ class Runner extends EventEmitter
     }
 
     /**
-     * 执行命令
+     * Run one command
      *
      * @param $command
      * @param $cwd
