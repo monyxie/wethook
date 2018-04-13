@@ -66,9 +66,18 @@ class Server {
         $this->mapper = new RequestTasksMapper($this->config);
 
         $this->manager = new TaskQueueManager($this->loop);
+//        $this->manager->on(TaskQueueManager::EVENT_AFTER_ENQUEUE, function ($command, $cwd) {
+//            $command = var_export($command, true);
+//            $this->logger->write("<{$cwd}> {$command}");
+//        });
+//        $this->manager->on(TaskRunner::EVENT_BEFORE_RUN, function ($command, $cwd) {
+//            $command = var_export($command, true);
+//            $this->logger->write("<{$cwd}> {$command}");
+//        });
         $this->manager->on(TaskRunner::EVENT_AFTER_RUN, function ($command, $cwd, $output) {
+            $cwd = var_export($cwd, true);
             $command = var_export($command, true);
-            $this->logger->write("<{$cwd}> {$command} {$output}");
+            $this->logger->write("Finished running ({$command}, {$cwd}) {$output}");
         });
     }
 
@@ -82,6 +91,11 @@ class Server {
                 return $next($request);
             },
             function (ServerRequestInterface $request) {
+                $this->loop->addTimer(0, function() {
+                    $numRunning = $this->manager->getNumRunning();
+                    $numQueueing = $this->manager->getNumQueueing();
+                    $this->logger->write("Queueing tasks: $numQueueing, Running tasks: $numRunning");
+                });
                 return $this->router->route($request);
             },
         ]);
