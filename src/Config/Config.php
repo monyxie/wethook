@@ -30,7 +30,7 @@ class Config {
         $value = $this->data;
         foreach ($keys as $item) {
             if (! isset($value[$item])) {
-                throw new ConfigKeyNotFoundException('找不到配置项: ' . $key);
+                throw new ConfigKeyNotFoundException('Config key not found: ' . $key);
             }
             $value = $value[$item];
         }
