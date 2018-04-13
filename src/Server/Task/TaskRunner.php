@@ -1,20 +1,20 @@
 <?php
 
-namespace Monyxie\Webhooked\Server\Command;
+namespace Monyxie\Webhooked\Server\Task;
 
 
 use Evenement\EventEmitter;
-use Monyxie\Webhooked\Server\Command;
+use Monyxie\Webhooked\Server\Task;
 use React\ChildProcess\Process;
 use React\EventLoop\LoopInterface;
 
 /**
- * Class CommandExecutor
- * @package Monyxie\Webhooked\Server\Command
+ * Class TaskRunner
+ * @package Monyxie\Webhooked\Server\Task
  */
-class CommandExecutor extends EventEmitter {
-    const EVENT_BEFORE_COMMAND = 'beforeCommand';
-    const EVENT_AFTER_COMMAND = 'afterCommand';
+class TaskRunner extends EventEmitter {
+    const EVENT_BEFORE_RUN = 'taskRunner.beforeCommand';
+    const EVENT_AFTER_RUN = 'taskRunner.afterCommand';
 
     private $isRunning = false;
     /**
@@ -51,7 +51,7 @@ class CommandExecutor extends EventEmitter {
         $resume = null;
         $generatorMaker = function() use (&$resume) {
             while (! $this->queue->isEmpty()) {
-                /* @var Command */
+                /* @var Task */
                 $command = $this->queue->dequeue();
                 yield $this->runCommand($command->getCommand(), $command->getWorkingDirectory(), $resume);
             }
@@ -76,9 +76,7 @@ class CommandExecutor extends EventEmitter {
      * @throws \RuntimeException
      */
     private function runCommand($command, $cwd, $onExit) {
-        $that = $this;
-
-        $this->emit(static::EVENT_BEFORE_COMMAND, [
+        $this->emit(static::EVENT_BEFORE_RUN, [
             'command' => $command,
             'cwd' => $cwd,
         ]);
@@ -87,8 +85,8 @@ class CommandExecutor extends EventEmitter {
         $appendOutput = function($chunk) use (&$output) {
             $output .= $chunk;
         };
-        $handleProcessExit = function() use ($that, $cwd, $command, $onExit, &$output) {
-            $that->emit(static::EVENT_AFTER_COMMAND, [
+        $handleProcessExit = function() use ($cwd, $command, $onExit, &$output) {
+            $this->emit(static::EVENT_AFTER_RUN, [
                 $command,
                 $cwd,
                 $output,

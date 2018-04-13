@@ -4,10 +4,10 @@ namespace Monyxie\Webhooked\Server;
 
 
 /**
- * Class Command
+ * Class Task
  * @package Monyxie\Webhooked\Server
  */
-class Command {
+class Task {
     /**
      * @var string Working directory
      */

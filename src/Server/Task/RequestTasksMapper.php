@@ -1,16 +1,16 @@
 <?php
 
-namespace Monyxie\Webhooked\Server\Command;
+namespace Monyxie\Webhooked\Server\Task;
 
 use Monyxie\Webhooked\Config\Config;
 use Monyxie\Webhooked\Request\BasicRequestInterface;
-use Monyxie\Webhooked\Server\Command;
+use Monyxie\Webhooked\Server\Task;
 
 /**
- * Map request to commands according to configuration.
+ * Map request to tasks according to configuration.
  * @package Monyxie\Webhooked\Server
  */
-class RequestCommandsMapper
+class RequestTasksMapper
 {
 
     /**
@@ -25,7 +25,7 @@ class RequestCommandsMapper
     /**
      * @param BasicRequestInterface $request
      *
-     * @return Command[]
+     * @return Task[]
      * @throws \Monyxie\Webhooked\Config\ConfigKeyNotFoundException
      * @throws InvalidSecretException
      * @throws UnsupportedEventException
@@ -45,13 +45,13 @@ class RequestCommandsMapper
     /**
      * @param $repoName
      *
-     * @return Command[]
+     * @return Task[]
      * @throws \Monyxie\Webhooked\Config\ConfigKeyNotFoundException
      */
     private function mapRepoName($repoName) {
         $repos = $this->config->get('repos');
 
-        $commands = [];
+        $tasks = [];
         foreach ($repos as $repo) {
             if ($repoName !== $repo['name']) {
                 continue;
@@ -60,12 +60,12 @@ class RequestCommandsMapper
             $directories = is_array($repo['directories']) ? $repo['directories'] : [$repo['directories']];
             foreach ($directories as $directory) {
                 foreach ($repo['commands'] as $command) {
-                    $commands []= new Command($command, $directory);
+                    $tasks []= new Task($command, $directory);
                 }
             }
         }
 
-        return $commands;
+        return $tasks;
     }
 
 }
