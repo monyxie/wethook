@@ -77,7 +77,10 @@ class Server {
         $this->manager->on(TaskRunner::EVENT_AFTER_RUN, function ($command, $cwd, $output) {
             $cwd = var_export($cwd, true);
             $command = var_export($command, true);
-            $this->logger->write("Finished running ({$command}, {$cwd}) {$output}");
+            if ($output !== '') {
+                $output = ' > ' . join("\n > ", explode("\n", rtrim($output, "\n")));
+            }
+            $this->logger->write("Finished running ({$command}, {$cwd})\n{$output}");
         });
     }
 
