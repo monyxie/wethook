@@ -77,8 +77,8 @@ class TaskRunner extends EventEmitter {
      */
     private function runCommand($command, $cwd, $onExit) {
         $this->emit(static::EVENT_BEFORE_RUN, [
-            'command' => $command,
-            'cwd' => $cwd,
+            $command,
+            $cwd,
         ]);
 
         $output = '';
