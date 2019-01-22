@@ -97,7 +97,7 @@ class Server
         $this->httpServer->listen($this->socketServer);
 
         $this->router->addRoute('GET', '/', function (ServerRequestInterface $request, ResponseInterface $response) {
-            return $response->withBody(stream_for("Hello! this is webhooked, a webhook manager."));
+            return $response->withBody(stream_for("Hello! This is webhooked, a webhook-triggered task runner."));
         });
 
         $this->logger->info("Server started.", ['address' => $this->socketServer->getAddress()]);

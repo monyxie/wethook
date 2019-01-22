@@ -9,7 +9,7 @@ define('PATH_CONFIG', PATH_ROOT . '/config');
 define('PATH_RUNTIME', PATH_ROOT . '/runtime');
 
 $doc = <<<DOC
-Webhooked, a webhook runner.
+Webhooked, a webhook-triggered task runner.
 
 Usage:
   webhooked.php [-l addr:port]
