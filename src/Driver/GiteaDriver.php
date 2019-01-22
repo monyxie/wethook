@@ -2,7 +2,7 @@
 
 namespace Monyxie\Webhooked\Driver;
 
-use Monyxie\Webhooked\Driver\Exception\HandlerException;
+use Monyxie\Webhooked\Driver\Exception\DriverException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -56,16 +56,16 @@ class GiteaDriver implements DriverInterface
             || !isset($bodyData->repository->full_name)
             || empty($eventName)
         ) {
-            throw new HandlerException();
+            throw new DriverException('Malformed request.');
         }
 
         if ($this->secret && $this->secret !== $bodyData->secret) {
-            throw new HandlerException();
+            throw new DriverException('Secret mismatch.');
         }
 
         $event = new HookEvent();
         $event->driver = $this->getIdentifier();
-        $event->event = $event;
+        $event->event = $eventName;
         $event->target = $bodyData->repository->full_name;
         $event->data = $bodyData;
 

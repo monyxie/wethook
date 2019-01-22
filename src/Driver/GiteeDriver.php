@@ -2,7 +2,7 @@
 
 namespace Monyxie\Webhooked\Driver;
 
-use Monyxie\Webhooked\Driver\Exception\HandlerException;
+use Monyxie\Webhooked\Driver\Exception\DriverException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -44,15 +44,14 @@ class GiteeDriver implements DriverInterface
      */
     public function handle(ServerRequestInterface $request, ResponseInterface $response): Result
     {
-
         $bodyData = json_decode($request->getBody());
 
         if ($bodyData === null || !isset($bodyData->password) || !isset($bodyData->project->path_with_namespace) || !isset($bodyData->hook_name)) {
-            throw new HandlerException();
+            throw new DriverException('Malformed request.');
         }
 
         if ($this->password && $bodyData->password !== $this->password) {
-            throw new HandlerException();
+            throw new DriverException('Password mismatch.');
         }
 
         $event = new HookEvent();

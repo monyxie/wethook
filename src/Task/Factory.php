@@ -11,36 +11,64 @@ use Monyxie\Webhooked\Driver\HookEvent;
 class Factory
 {
     /**
-     * @var string
+     * @var array
      */
-    private $hookPath;
+    private $tasks;
 
     /**
      * Factory constructor.
-     * @param $hookPath
+     * @param $taskDefinitions
      */
-    public function __construct($hookPath)
+    public function __construct($taskDefinitions)
     {
-        $this->hookPath = rtrim($hookPath, '/\\') . DIRECTORY_SEPARATOR;
+        $this->tasks = $taskDefinitions;
     }
 
     /**
      * @param HookEvent $hookEvent
-     * @return Task
+     * @return Task[]
      */
     public function fromHookEvent(HookEvent $hookEvent)
     {
-        if (! $hookEvent->driver || ! $hookEvent->event) {
-            return null;
+        $tasks = [];
+
+        $env = [
+            'wh.driver' => $hookEvent->driver,
+            'wh.event' => $hookEvent->event,
+            'wh.target' => $hookEvent->target,
+            'wh.data' => $hookEvent->data,
+        ];
+
+        foreach ($this->tasks as $item) {
+            if ($this->matchDefinition($hookEvent, $item)) {
+                foreach ($item['where'] as $dir) {
+                    foreach ($item['what'] as $cmd) {
+                        $tasks [] = new Task($cmd, $dir, $env);
+                    }
+                }
+            }
         }
 
-        $filename = $this->hookPath . $hookEvent->driver . DIRECTORY_SEPARATOR . $hookEvent->event;
-
-        if (! file_exists($filename)) {
-            return null;
-        }
-
-        return new Task($filename, '.');
+        return $tasks;
     }
 
+    /**
+     * @param HookEvent $hookEvent
+     * @param $definition
+     * @return bool
+     */
+    private function matchDefinition(HookEvent $hookEvent, $definition): bool
+    {
+        if (isset($definition['when']['driver'])) {
+            if ($hookEvent->driver !== $definition['when']['driver']) return false;
+        }
+        if (isset($definition['when']['event'])) {
+            if ($hookEvent->event !== $definition['when']['event']) return false;
+        }
+        if (isset($definition['when']['target'])) {
+            if ($hookEvent->target !== $definition['when']['target']) return false;
+        }
+
+        return true;
+    }
 }

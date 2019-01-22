@@ -18,10 +18,16 @@ class Task
      */
     private $command;
 
-    public function __construct($command, $workingDirectory)
+    /**
+     * @var array Environment variables
+     */
+    private $environment;
+
+    public function __construct(string $command, string $workingDirectory, array $environment)
     {
         $this->command = $command;
         $this->workingDirectory = $workingDirectory;
+        $this->environment = $environment;
     }
 
     /**
@@ -38,5 +44,12 @@ class Task
     public function getCommand(): string
     {
         return $this->command;
+    }
+
+    /**
+     * @return array
+     */
+    public function getEnvironment() {
+        return $this->environment;
     }
 }

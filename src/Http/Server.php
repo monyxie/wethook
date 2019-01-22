@@ -84,8 +84,10 @@ class Server
     public function run()
     {
         $this->registry->on('hook', function (HookEvent $hookEvent) {
-            if ($task = $this->taskFactory->fromHookEvent($hookEvent)) {
-                $this->taskRunner->enqueue($task);
+            if ($tasks = $this->taskFactory->fromHookEvent($hookEvent)) {
+                foreach ($tasks as $task) {
+                    $this->taskRunner->enqueue($task);
+                }
             }
         });
 

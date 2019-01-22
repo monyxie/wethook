@@ -46,8 +46,14 @@ class Runner implements EventEmitterInterface
     {
         $this->queue->enqueue($task);
 
+        $this->logger->log(LogLevel::INFO, 'Task queued.', ['command' => $task->getCommand(), 'workingDirectory' => $task->getWorkingDirectory()]);
+
         if (!$this->isRunning) {
-            $this->run();
+            $this->isRunning = true;
+
+            $this->loop->addTimer(0, function() {
+                $this->run();
+            });
         }
     }
 
@@ -56,17 +62,12 @@ class Runner implements EventEmitterInterface
      */
     private function run()
     {
-        if ($this->isRunning) {
-            return;
-        }
-        $this->isRunning = true;
-
         $resume = null;
         $generatorMaker = function () use (&$resume) {
             while (!$this->queue->isEmpty()) {
                 /* @var Task */
                 $task = $this->queue->dequeue();
-                $this->runCommand($task->getCommand(), $task->getWorkingDirectory(), $resume);
+                $this->runCommand($task->getCommand(), $task->getWorkingDirectory(), $task->getEnvironment(), $resume);
                 yield;
             }
             $this->isRunning = false;
@@ -83,11 +84,12 @@ class Runner implements EventEmitterInterface
     /**
      * Run one command.
      *
-     * @param $cmd
-     * @param $cwd
-     * @param $onExit
+     * @param string $cmd
+     * @param string $cwd
+     * @param array $env
+     * @param callable $onExit
      */
-    private function runCommand($cmd, $cwd, $onExit)
+    private function runCommand(string $cmd, string $cwd, array $env, callable $onExit)
     {
         $output = '';
         $appendOutput = function ($chunk) use (&$output) {
@@ -99,7 +101,8 @@ class Runner implements EventEmitterInterface
             return call_user_func($onExit);
         };
 
-        $process = new Process($cmd, $cwd);
+        // TODO pass event data as environment variables
+        $process = new Process($cmd, $cwd, null);
         $process->start($this->loop);
         $process->stdout->on('data', $appendOutput);
         $process->stderr->on('data', $appendOutput);
