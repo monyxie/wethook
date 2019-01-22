@@ -13,7 +13,7 @@ return [
                 'target' => 'monyxie/webhooked',
             ],
             'where' => ['/outside/code/webhooked'],
-            'what' => ['git pull >> a.txt', 'git status >> a.txt'],
+            'what' => ['git pull', 'npm install'],
         ]
     ]
 ];

@@ -34,7 +34,9 @@ $builder = new \DI\ContainerBuilder();
 $builder->enableCompilation(PATH_RUNTIME . '/tmp');
 $builder->writeProxiesToFile(true, PATH_RUNTIME . '/tmp/proxies');
 $builder->addDefinitions(PATH_CONFIG . '/definitions.php');
-$builder->addDefinitions(PATH_CONFIG . '/config.php');
+if (file_exists(PATH_CONFIG . '/config.php')) {
+    $builder->addDefinitions(PATH_CONFIG . '/config.php');
+}
 $builder->addDefinitions($defs);
 
 $container = $builder->build();
