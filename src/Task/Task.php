@@ -1,23 +1,25 @@
 <?php
 
-namespace Monyxie\Webhooked\Server;
-
+namespace Monyxie\Webhooked\Task;
 
 /**
  * Class Task
- * @package Monyxie\Webhooked\Server
+ * @package Monyxie\Webhooked\Http
  */
-class Task {
+class Task
+{
     /**
      * @var string Working directory
      */
     private $workingDirectory;
+
     /**
      * @var string Command to execute
      */
     private $command;
 
-    public function __construct($command, $workingDirectory) {
+    public function __construct($command, $workingDirectory)
+    {
         $this->command = $command;
         $this->workingDirectory = $workingDirectory;
     }
@@ -25,14 +27,16 @@ class Task {
     /**
      * @return string
      */
-    public function getWorkingDirectory(): string {
+    public function getWorkingDirectory(): string
+    {
         return $this->workingDirectory;
     }
 
     /**
      * @return string
      */
-    public function getCommand(): string {
+    public function getCommand(): string
+    {
         return $this->command;
     }
 }

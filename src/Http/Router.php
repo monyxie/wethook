@@ -1,6 +1,6 @@
 <?php
 
-namespace Monyxie\Webhooked\Server;
+namespace Monyxie\Webhooked\Http;
 
 
 use Psr\Http\Message\ServerRequestInterface;
@@ -8,9 +8,10 @@ use React\Http\Response;
 
 /**
  * Route HTTP requests.
- * @package Monyxie\Webhooked\Server
+ * @package Monyxie\Webhooked\Http
  */
-class Router {
+class Router
+{
     /**
      * @var array
      */
@@ -21,7 +22,8 @@ class Router {
      * @param string $path
      * @param callable $handler
      */
-    public function register(string $method, string $path, callable $handler) {
+    public function addRoute(string $method, string $path, callable $handler)
+    {
         $this->routes[$path][strtoupper($method)] = $handler;
     }
 
@@ -29,15 +31,23 @@ class Router {
      * @param ServerRequestInterface $request
      * @return mixed|Response
      */
-    public function route(ServerRequestInterface $request) {
+    public function __invoke(ServerRequestInterface $request)
+    {
 
         $path = $request->getUri()->getPath();
         $method = strtoupper($request->getMethod());
 
-        if (isset($this->routes[$path][$method])) {
-            return call_user_func($this->routes[$path][$method], $request);
-        }
-        else if (isset($this->routes[$path])) {
+        if (isset($this->routes[$path])) {
+            if (isset($this->routes[$path][$method])) {
+                $handler = $this->routes[$path][$method];
+            } else if (isset($this->routes[$path]['*'])) {
+                $handler = $this->routes[$path]['*'];
+            }
+
+            if (isset($handler)) {
+                return call_user_func($handler, $request, new Response(200, [], 'OK'));
+            }
+
             return new Response(405, [], '405 Method Not Allowed');
         }
 
