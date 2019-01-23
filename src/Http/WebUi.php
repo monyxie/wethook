@@ -65,7 +65,7 @@ class WebUi
                 [
                     'name' => 'Runner Status',
                     'title' => '',
-                    'value' => $this->runner->isRunning() ? 'running' : 'idle',
+                    'value' => $this->runner->isRunning() ? 'busy' : 'idle',
                 ],
                 [
                     'name' => 'Enqueued Tasks',
