@@ -12,12 +12,13 @@ $doc = <<<DOC
 Webhooked, a webhook-triggered task runner.
 
 Usage:
-  webhooked.php [-l addr:port]
+  webhooked.php [-l addr:port] [--debug]
   webhooked.php (-h | --help)
   webhooked.php --version
 
 Options:
   -l --listen addr:port  Set the address and port to listen.
+  --debug                Run in debug mode.
   -h --help              Show this screen.
   --version              Show version.
 
@@ -31,8 +32,10 @@ if ($args['--listen']) {
 }
 
 $builder = new \DI\ContainerBuilder();
-$builder->enableCompilation(PATH_RUNTIME . '/tmp');
-$builder->writeProxiesToFile(true, PATH_RUNTIME . '/tmp/proxies');
+if ($args['--debug']) {
+    $builder->enableCompilation(PATH_RUNTIME . '/tmp');
+    $builder->writeProxiesToFile(true, PATH_RUNTIME . '/tmp/proxies');
+}
 $builder->addDefinitions(PATH_CONFIG . '/definitions.php');
 if (file_exists(PATH_CONFIG . '/config.php')) {
     $builder->addDefinitions(PATH_CONFIG . '/config.php');

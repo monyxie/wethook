@@ -16,9 +16,29 @@ class Runner implements EventEmitterInterface
 {
     use EventEmitterTrait;
 
+    /**
+     * @var bool Whether the task runner is running.
+     */
     private $isRunning = false;
     /**
-     * @var \SplQueue
+     * @var int Total number of tasks that have been enqueued.
+     */
+    private $numEnqueued = 0;
+    /**
+     * @var int Total number of tasks that have finished running.
+     */
+    private $numFinished = 0;
+    /**
+     * @var int The last time a task was enqueued.
+     */
+    private $lastEnqueuedAt = 0;
+    /**
+     * @var int The last time a task finished running.
+     */
+    private $lastFinishedAt = 0;
+
+    /**
+     * @var \SplQueue The queue.
      */
     private $queue;
     /**
@@ -42,16 +62,21 @@ class Runner implements EventEmitterInterface
         $this->logger = $logger;
     }
 
+    /**
+     * @param Task $task
+     */
     public function enqueue(Task $task)
     {
         $this->queue->enqueue($task);
+        $this->numEnqueued++;
+        $this->lastEnqueuedAt = time();
 
         $this->logger->log(LogLevel::INFO, 'Task queued.', ['command' => $task->getCommand(), 'workingDirectory' => $task->getWorkingDirectory()]);
 
         if (!$this->isRunning) {
             $this->isRunning = true;
 
-            $this->loop->addTimer(0, function() {
+            $this->loop->addTimer(0, function () {
                 $this->run();
             });
         }
@@ -75,6 +100,8 @@ class Runner implements EventEmitterInterface
 
         $generator = $generatorMaker();
         $resume = function () use ($generator) {
+            $this->numFinished++;
+            $this->lastFinishedAt = time();
             $generator->next();
         };
 
@@ -107,5 +134,45 @@ class Runner implements EventEmitterInterface
         $process->stdout->on('data', $appendOutput);
         $process->stderr->on('data', $appendOutput);
         $process->on('exit', $handleProcessExit);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRunning(): bool
+    {
+        return $this->isRunning;
+    }
+
+    /**
+     * @return int
+     */
+    public function getNumEnqueued(): int
+    {
+        return $this->numEnqueued;
+    }
+
+    /**
+     * @return int
+     */
+    public function getNumFinished(): int
+    {
+        return $this->numFinished;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLastEnqueuedAt(): int
+    {
+        return $this->lastEnqueuedAt;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLastFinishedAt(): int
+    {
+        return $this->lastFinishedAt;
     }
 }

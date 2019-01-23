@@ -2,6 +2,7 @@
 
 use function DI\create;
 use function DI\get;
+use League\Plates\Engine as TemplateEngine;
 use Monolog\Logger;
 use Monyxie\Webhooked\Driver\GiteaDriver;
 use Monyxie\Webhooked\Driver\GiteeDriver;
@@ -34,10 +35,11 @@ return [
     Registry::class => create(Registry::class)
         ->constructor(get(LoggerInterface::class))
         ->method('addDriver', get(GiteaDriver::class))
-        ->method('addDriver', get(GiteeDriver::class))
-        ->method('addRoutes', get(Router::class)),
+        ->method('addDriver', get(GiteeDriver::class)),
     GiteaDriver::class => create(GiteaDriver::class)
         ->constructor(get('gitea.secret')),
     GiteeDriver::class => create(GiteeDriver::class)
         ->constructor(get('gitee.password')),
+    TemplateEngine::class => create(TemplateEngine::class)
+        ->constructor(PATH_ROOT . '/resources/views'),
 ];

@@ -48,6 +48,10 @@ class Server
      * @var Router
      */
     private $router;
+    /**
+     * @var WebUi
+     */
+    private $webUi;
 
     /**
      * Server constructor.
@@ -58,6 +62,7 @@ class Server
      * @param Factory $factory
      * @param Runner $taskRunner
      * @param Router $router
+     * @param WebUi $webUi
      */
     public function __construct(
         LoggerInterface $logger,
@@ -66,7 +71,8 @@ class Server
         Registry $registry,
         Factory $factory,
         Runner $taskRunner,
-        Router $router
+        Router $router,
+        WebUi $webUi
     )
     {
         $this->logger = $logger;
@@ -76,6 +82,7 @@ class Server
         $this->taskFactory = $factory;
         $this->socketServer = $socketServer;
         $this->router = $router;
+        $this->webUi = $webUi;
     }
 
     /**
@@ -83,6 +90,8 @@ class Server
      */
     public function run()
     {
+        $this->webUi->addRoutes($this->router);
+        $this->registry->addRoutes($this->router);
         $this->registry->on('hook', function (HookEvent $hookEvent) {
             if ($tasks = $this->taskFactory->fromHookEvent($hookEvent)) {
                 foreach ($tasks as $task) {
@@ -97,10 +106,6 @@ class Server
         });
 
         $this->httpServer->listen($this->socketServer);
-
-        $this->router->addRoute('GET', '/', function (ServerRequestInterface $request, ResponseInterface $response) {
-            return $response->withBody(stream_for("Hello! This is webhooked, a webhook-triggered task runner."));
-        });
 
         $this->logger->info("Server started.", ['address' => $this->socketServer->getAddress()]);
     }
