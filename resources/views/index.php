@@ -22,8 +22,8 @@
     <tr>
         <td><?= $numEnqueued ?></td>
         <td><?= $numFinished ?></td>
-        <td><?= date('Y-m-d H:i:s', $lastEnqueuedAt) ?></td>
-        <td><?= date('Y-m-d H:i:s', $lastFinishedAt) ?></td>
+        <td><?= date('Y-m-d H:i:s', $latestEnqueuedAt) ?></td>
+        <td><?= date('Y-m-d H:i:s', $latestFinishedAt) ?></td>
     </tr>
     </tbody>
 </table>

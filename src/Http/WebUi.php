@@ -37,8 +37,8 @@ class WebUi
             $data = [
                 'numEnqueued' => $this->runner->getNumEnqueued(),
                 'numFinished' => $this->runner->getNumFinished(),
-                'lastEnqueuedAt' => $this->runner->getLastEnqueuedAt(),
-                'lastFinishedAt' => $this->runner->getLastFinishedAt(),
+                'latestEnqueuedAt' => $this->runner->getLatestEnqueuedAt(),
+                'latestFinishedAt' => $this->runner->getLatestFinishedAt(),
             ];
             return $response->withBody(stream_for($this->engine->render('index', $data)));
         });

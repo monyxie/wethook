@@ -29,13 +29,13 @@ class Runner implements EventEmitterInterface
      */
     private $numFinished = 0;
     /**
-     * @var int The last time a task was enqueued.
+     * @var int The latest time a task was enqueued.
      */
-    private $lastEnqueuedAt = 0;
+    private $latestEnqueuedAt = 0;
     /**
-     * @var int The last time a task finished running.
+     * @var int The latest time a task finished running.
      */
-    private $lastFinishedAt = 0;
+    private $latestFinishedAt = 0;
 
     /**
      * @var \SplQueue The queue.
@@ -69,7 +69,7 @@ class Runner implements EventEmitterInterface
     {
         $this->queue->enqueue($task);
         $this->numEnqueued++;
-        $this->lastEnqueuedAt = time();
+        $this->latestEnqueuedAt = time();
 
         $this->logger->log(LogLevel::INFO, 'Task queued.', ['command' => $task->getCommand(), 'workingDirectory' => $task->getWorkingDirectory()]);
 
@@ -101,7 +101,7 @@ class Runner implements EventEmitterInterface
         $generator = $generatorMaker();
         $resume = function () use ($generator) {
             $this->numFinished++;
-            $this->lastFinishedAt = time();
+            $this->latestFinishedAt = time();
             $generator->next();
         };
 
@@ -163,16 +163,16 @@ class Runner implements EventEmitterInterface
     /**
      * @return int
      */
-    public function getLastEnqueuedAt(): int
+    public function getLatestEnqueuedAt(): int
     {
-        return $this->lastEnqueuedAt;
+        return $this->latestEnqueuedAt;
     }
 
     /**
      * @return int
      */
-    public function getLastFinishedAt(): int
+    public function getLatestFinishedAt(): int
     {
-        return $this->lastFinishedAt;
+        return $this->latestFinishedAt;
     }
 }
