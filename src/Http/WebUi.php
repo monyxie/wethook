@@ -9,6 +9,7 @@ use Monyxie\Wethook\Driver\Registry;
 use Monyxie\Wethook\Task\Runner;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use React\EventLoop\LoopInterface;
 use function RingCentral\Psr7\stream_for;
 
 class WebUi
@@ -25,18 +26,24 @@ class WebUi
      * @var Registry
      */
     private $registry;
+    /**
+     * @var LoopInterface
+     */
+    private $loop;
 
     /**
      * WebUi constructor.
      * @param TemplateEngine $engine
      * @param Runner $runner
      * @param Registry $registry
+     * @param LoopInterface $loop
      */
-    public function __construct(TemplateEngine $engine, Runner $runner, Registry $registry)
+    public function __construct(TemplateEngine $engine, Runner $runner, Registry $registry, LoopInterface $loop)
     {
         $this->engine = $engine;
         $this->runner = $runner;
         $this->registry = $registry;
+        $this->loop = $loop;
     }
 
     public function addRoutes(Router $router) {
@@ -57,6 +64,11 @@ class WebUi
 
         $data = [
             'fields' => [
+                [
+                    'name' => 'Loop Class',
+                    'title' => '',
+                    'value' => end(explode('\\', get_class($this->loop))),
+                ],
                 [
                     'name' => 'Registered Drivers',
                     'title' => '',
