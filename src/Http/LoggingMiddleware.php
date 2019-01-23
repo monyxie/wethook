@@ -1,6 +1,6 @@
 <?php
 
-namespace Monyxie\Webhooked\Http;
+namespace Monyxie\Wethook\Http;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -8,7 +8,7 @@ use Psr\Log\LoggerInterface;
 
 /**
  * Log HTTP requests.
- * @package Monyxie\Webhooked\Http
+ * @package Monyxie\Wethook\Http
  */
 class LoggingMiddleware
 {

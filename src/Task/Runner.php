@@ -1,6 +1,6 @@
 <?php
 
-namespace Monyxie\Webhooked\Task;
+namespace Monyxie\Wethook\Task;
 
 use Evenement\EventEmitterInterface;
 use Evenement\EventEmitterTrait;

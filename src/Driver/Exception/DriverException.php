@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Monyxie\Webhooked\Driver\Exception;
+namespace Monyxie\Wethook\Driver\Exception;
 
 
 class DriverException extends \Exception

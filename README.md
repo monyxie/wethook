@@ -1,1 +1,1 @@
-This is _webhooked_, a webhook-triggered task runner.
+This is _wethook_, a webhook-triggered task runner.

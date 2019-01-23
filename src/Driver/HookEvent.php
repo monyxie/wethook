@@ -1,6 +1,6 @@
 <?php
 
-namespace Monyxie\Webhooked\Driver;
+namespace Monyxie\Wethook\Driver;
 
 class HookEvent
 {

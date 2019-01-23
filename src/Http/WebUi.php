@@ -1,12 +1,12 @@
 <?php
 
 
-namespace Monyxie\Webhooked\Http;
+namespace Monyxie\Wethook\Http;
 
 
 use League\Plates\Engine as TemplateEngine;
-use Monyxie\Webhooked\Driver\Registry;
-use Monyxie\Webhooked\Task\Runner;
+use Monyxie\Wethook\Driver\Registry;
+use Monyxie\Wethook\Task\Runner;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use function RingCentral\Psr7\stream_for;

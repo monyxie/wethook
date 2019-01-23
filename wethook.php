@@ -10,12 +10,10 @@ define('PATH_CONFIG', PATH_ROOT . '/config');
 define('PATH_RUNTIME', PATH_ROOT . '/runtime');
 
 $doc = <<<DOC
-Webhooked, a webhook-triggered task runner.
-
 Usage:
-  webhooked.php [-l addr:port] [--debug]
-  webhooked.php (-h | --help)
-  webhooked.php --version
+  wethook.php [-l addr:port] [--debug]
+  wethook.php (-h | --help)
+  wethook.php --version
 
 Options:
   -l --listen addr:port  Set the address and port to listen.
@@ -44,5 +42,5 @@ if (file_exists(PATH_CONFIG . '/config.php')) {
 $builder->addDefinitions($defs);
 
 $container = $builder->build();
-$container->get(\Monyxie\Webhooked\Http\Server::class)->run();
+$container->get(\Monyxie\Wethook\Http\Server::class)->run();
 $container->get(\React\EventLoop\LoopInterface::class)->run();

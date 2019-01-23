@@ -10,9 +10,9 @@ return [
             'when' => [
                 'driver' => 'gitea',
                 'event' => 'push',
-                'target' => 'monyxie/webhooked',
+                'target' => 'monyxie/wethook',
             ],
-            'where' => ['/outside/code/webhooked'],
+            'where' => ['/outside/code/wethook'],
             'what' => ['git pull', 'npm install'],
         ]
     ]

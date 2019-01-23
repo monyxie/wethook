@@ -1,11 +1,11 @@
 <?php
 
-namespace Monyxie\Webhooked\Http;
+namespace Monyxie\Wethook\Http;
 
-use Monyxie\Webhooked\Driver\HookEvent;
-use Monyxie\Webhooked\Driver\Registry;
-use Monyxie\Webhooked\Task\Factory;
-use Monyxie\Webhooked\Task\Runner;
+use Monyxie\Wethook\Driver\HookEvent;
+use Monyxie\Wethook\Driver\Registry;
+use Monyxie\Wethook\Task\Factory;
+use Monyxie\Wethook\Task\Runner;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
@@ -16,7 +16,7 @@ use function RingCentral\Psr7\stream_for;
 /**
  * Class Server
  *
- * @package Monyxie\Webhooked\Http
+ * @package Monyxie\Wethook\Http
  */
 class Server
 {

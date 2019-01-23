@@ -1,10 +1,10 @@
 <?php
 
-namespace Monyxie\Webhooked\Task;
+namespace Monyxie\Wethook\Task;
 
 /**
  * Class Task
- * @package Monyxie\Webhooked\Http
+ * @package Monyxie\Wethook\Http
  */
 class Task
 {

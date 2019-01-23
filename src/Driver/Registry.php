@@ -1,11 +1,11 @@
 <?php
 
-namespace Monyxie\Webhooked\Driver;
+namespace Monyxie\Wethook\Driver;
 
 use Evenement\EventEmitterInterface;
 use Evenement\EventEmitterTrait;
-use Monyxie\Webhooked\Driver\Exception\DriverException;
-use Monyxie\Webhooked\Http\Router;
+use Monyxie\Wethook\Driver\Exception\DriverException;
+use Monyxie\Wethook\Http\Router;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;

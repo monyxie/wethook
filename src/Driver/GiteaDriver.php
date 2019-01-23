@@ -1,8 +1,8 @@
 <?php
 
-namespace Monyxie\Webhooked\Driver;
+namespace Monyxie\Wethook\Driver;
 
-use Monyxie\Webhooked\Driver\Exception\DriverException;
+use Monyxie\Wethook\Driver\Exception\DriverException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 

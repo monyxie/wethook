@@ -1,12 +1,12 @@
 <?php
 
-namespace Monyxie\Webhooked\Task;
+namespace Monyxie\Wethook\Task;
 
-use Monyxie\Webhooked\Driver\HookEvent;
+use Monyxie\Wethook\Driver\HookEvent;
 
 /**
  * Task factory.
- * @package Monyxie\Webhooked\Http
+ * @package Monyxie\Wethook\Http
  */
 class Factory
 {
