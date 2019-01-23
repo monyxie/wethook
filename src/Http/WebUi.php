@@ -63,6 +63,11 @@ class WebUi
                     'value' => join(', ', $drivers),
                 ],
                 [
+                    'name' => 'Runner Status',
+                    'title' => '',
+                    'value' => $this->runner->isRunning() ? 'running' : 'idle',
+                ],
+                [
                     'name' => 'Enqueued Tasks',
                     'title' => '',
                     'value' => $this->runner->getNumEnqueued(),
@@ -95,6 +100,11 @@ class WebUi
                     'name' => 'Mem Usage',
                     'title' => '',
                     'value' => $this->formatMemory(memory_get_usage(false)),
+                ],
+                [
+                    'name' => 'Running Since',
+                    'title' => '',
+                    'value' => date('Y-m-d H:i:s', STARTUP_TIME),
                 ],
             ]
         ];

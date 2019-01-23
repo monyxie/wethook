@@ -2,6 +2,7 @@
 
 require(__DIR__ . '/vendor/autoload.php');
 
+define('STARTUP_TIME', time());
 define('VERSION', '0.1');
 define('PATH_ROOT', __DIR__);
 define('PATH_SRC', PATH_ROOT . '/src');
