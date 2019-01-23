@@ -9,22 +9,14 @@
 </head>
 <body>
 <p>Welcome! This is <i>webhooked</i>, a task runner for webhook-triggered tasks.</p>
-<table>
-    <thead>
-    <tr>
-        <th title="Number of tasks enqueued.">Enqueued</th>
-        <th title="Number of tasks finished.">Finished</th>
-        <th title="Time at which the latest task was enqueued.">Last Enqueued</th>
-        <th title="Time at which the latest task finished running.">Last Finished</th>
-    </tr>
-    </thead>
+<table style="text-align:left;">
     <tbody>
+    <?php foreach ($fields as $field): ?>
     <tr>
-        <td><?= $numEnqueued ?></td>
-        <td><?= $numFinished ?></td>
-        <td><?= date('Y-m-d H:i:s', $latestEnqueuedAt) ?></td>
-        <td><?= date('Y-m-d H:i:s', $latestFinishedAt) ?></td>
+        <th title="<?= $this->e($field['title']) ?>"><?= $this->e($field['name']) ?></th>
+        <td><?= $this->e($field['value']) ?></td>
     </tr>
+    <?php endforeach; ?>
     </tbody>
 </table>
 </body>
