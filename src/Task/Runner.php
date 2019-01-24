@@ -51,6 +51,12 @@ class Runner implements EventEmitterInterface
     private $logger;
 
     /**
+     * Recent results.
+     * @var \SplQueue
+     */
+    private $results;
+
+    /**
      * Runner constructor.
      * @param LoopInterface $loop
      * @param LoggerInterface $logger
@@ -60,6 +66,7 @@ class Runner implements EventEmitterInterface
         $this->loop = $loop;
         $this->queue = new \SplQueue();
         $this->logger = $logger;
+        $this->results = new \SplQueue();
     }
 
     /**
@@ -92,16 +99,22 @@ class Runner implements EventEmitterInterface
             while (!$this->queue->isEmpty()) {
                 /* @var Task */
                 $task = $this->queue->dequeue();
-                $this->runCommand($task->getCommand(), $task->getWorkingDirectory(), $task->getEnvironment(), $resume);
+                $this->runTask($task, $resume);
                 yield;
             }
             $this->isRunning = false;
         };
 
         $generator = $generatorMaker();
-        $resume = function () use ($generator) {
+        $resume = function (Result $result) use ($generator) {
             $this->numFinished++;
             $this->latestFinishedAt = time();
+
+            $this->results->enqueue($result);
+            if ($this->results->count() > 10) {
+                $this->results->dequeue();
+            }
+
             $generator->next();
         };
 
@@ -111,25 +124,32 @@ class Runner implements EventEmitterInterface
     /**
      * Run one command.
      *
-     * @param string $cmd
-     * @param string $cwd
-     * @param array $env
+     * @param Task $task
      * @param callable $onExit
      */
-    private function runCommand(string $cmd, string $cwd, array $env, callable $onExit)
+    private function runTask(Task $task, callable $onExit)
     {
+        $startTime = time();
         $output = '';
         $appendOutput = function ($chunk) use (&$output) {
             $output .= $chunk;
         };
-        $handleProcessExit = function ($exitCode, $termSignal) use ($cwd, $cmd, $onExit) {
+        $handleProcessExit = function ($exitCode, $termSignal) use ($startTime, &$output, $task, $onExit) {
+            $finishTime = time();
+
             $logLevel = $exitCode === 0 ? LogLevel::INFO : LogLevel::WARNING;
-            $this->logger->log($logLevel, 'Command finished running.', ['command' => $cmd, 'workingDirectory' => $cwd, 'exitCode' => $exitCode]);
-            return call_user_func($onExit);
+            $this->logger->log($logLevel, 'Command finished running.', [
+                'command' => $task->getCommand(),
+                'workingDirectory' => $task->getWorkingDirectory(),
+                'exitCode' => $exitCode
+            ]);
+
+            $result = new Result($task, $startTime, $finishTime, $exitCode, $output);
+            return call_user_func($onExit, $result);
         };
 
         // TODO pass event data as environment variables
-        $process = new Process($cmd, $cwd, null);
+        $process = new Process($task->getCommand(), $task->getWorkingDirectory(), null);
         $process->start($this->loop);
         $process->stdout->on('data', $appendOutput);
         $process->stderr->on('data', $appendOutput);
@@ -174,5 +194,18 @@ class Runner implements EventEmitterInterface
     public function getLatestFinishedAt(): int
     {
         return $this->latestFinishedAt;
+    }
+
+    /**
+     * @return array
+     */
+    public function getResults(): array
+    {
+        $results = [];
+        foreach ($this->results as $result) {
+            $results []= $result;
+        }
+
+        return $results;
     }
 }

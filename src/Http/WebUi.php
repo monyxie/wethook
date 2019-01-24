@@ -6,6 +6,7 @@ namespace Monyxie\Wethook\Http;
 
 use League\Plates\Engine as TemplateEngine;
 use Monyxie\Wethook\Driver\Registry;
+use Monyxie\Wethook\Task\Result;
 use Monyxie\Wethook\Task\Runner;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -122,7 +123,19 @@ class WebUi
                     'title' => '',
                     'value' => date('Y-m-d H:i:s', STARTUP_TIME),
                 ],
-            ]
+            ],
+            'results' => array_map(function (Result $result) {
+                $task = $result->getTask();
+                return [
+                    'startTime' => date('Y-m-d H:i:s', $result->getStartTime()),
+                    'finishTime' => date('Y-m-d H:i:s', $result->getFinishTime()),
+                    'command' => $task->getCommand(),
+                    'workingDirectory' => $task->getWorkingDirectory(),
+                    'exitCode' => $result->getExitCode(),
+                    'output' => $result->getOutput(),
+                    'outputBrief' => $this->truncateOutput($result->getOutput()),
+                ];
+            }, array_reverse($this->runner->getResults())),
         ];
         return $response->withBody(stream_for($this->engine->render('index', $data)));
     }
@@ -136,5 +149,24 @@ class WebUi
     {
         $unit = array('B','KiB','MiB','GiB','TiB','PiB');
         return @round($size/pow(1024,($i=floor(log($size,1024)))),2).' '.$unit[$i];
+    }
+
+    private function truncateOutput(string $output)
+    {
+        $linebreak = mb_strpos($output, "\n");
+        if ($linebreak > 0) {
+            $numKeep = $linebreak;
+        } else {
+            $numKeep = 50;
+        }
+
+        $len = mb_strlen($output);
+        if ($len <= $numKeep) {
+            return $output;
+        }
+
+        $output = mb_substr($output, 0, $numKeep);
+        $output .= '...(' . ($len - $numKeep) . ' more)';
+        return trim($output);
     }
 }
