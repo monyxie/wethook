@@ -67,7 +67,7 @@ class WebUi
                 [
                     'name' => 'Loop Class',
                     'title' => '',
-                    'value' => end(explode('\\', get_class($this->loop))),
+                    'value' => end($_ = explode('\\', get_class($this->loop))),
                 ],
                 [
                     'name' => 'Registered Drivers',
