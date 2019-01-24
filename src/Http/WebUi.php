@@ -153,6 +153,7 @@ class WebUi
 
     private function truncateOutput(string $output)
     {
+        $output = trim($output);
         $linebreak = mb_strpos($output, "\n");
         if ($linebreak > 0) {
             $numKeep = $linebreak;
