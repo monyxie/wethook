@@ -48,6 +48,7 @@ class WebUi
 
     public function addRoutes(Router $router) {
         $router->addRoute('GET', '/', [$this, 'actionIndex']);
+        $router->addRoute('GET', '/favicon.ico', [$this, 'actionFavicon']);
     }
 
     /**
@@ -62,12 +63,15 @@ class WebUi
             $drivers []= $driver->getIdentifier();
         }
 
+        $loopClassSegments = explode('\\', get_class($this->loop));
+        $loopClass = end($loopClassSegments);
+
         $data = [
             'fields' => [
                 [
                     'name' => 'Loop Class',
                     'title' => '',
-                    'value' => end($_ = explode('\\', get_class($this->loop))),
+                    'value' => $loopClass,
                 ],
                 [
                     'name' => 'Registered Drivers',
@@ -121,6 +125,11 @@ class WebUi
             ]
         ];
         return $response->withBody(stream_for($this->engine->render('index', $data)));
+    }
+
+    public function actionFavicon(ServerRequestInterface $request, ResponseInterface $response) {
+         return $response->withHeader('Content-Type', 'image/png')
+             ->withBody(stream_for(base64_decode('iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAeElEQVQ4y61TWw6AIAxrF4+u564fhgShQ0GX8MEebVkDJcEFSVuQxFufA8iGHVAH0A7XjK4WM3LbOwBspTBiHkVgMQpBzDC6p8aK7Lovnha3tAMHkjllAXhAb+R/ciEFKOwjFb8qgKTuYJe6HKCr/Z5n9p0zF9olniImdOsXukmPAAAAAElFTkSuQmCC')));
     }
 
     private function formatMemory($size)
