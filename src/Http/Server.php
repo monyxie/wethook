@@ -2,7 +2,7 @@
 
 namespace Monyxie\Wethook\Http;
 
-use Monyxie\Wethook\Driver\HookEvent;
+use Monyxie\Wethook\Driver\Event;
 use Monyxie\Wethook\Driver\Registry;
 use Monyxie\Wethook\Task\Factory;
 use Monyxie\Wethook\Task\Runner;
@@ -92,7 +92,7 @@ class Server
     {
         $this->webUi->addRoutes($this->router);
         $this->registry->addRoutes($this->router);
-        $this->registry->on('hook', function (HookEvent $hookEvent) {
+        $this->registry->on('hook', function (Event $hookEvent) {
             if ($tasks = $this->taskFactory->fromHookEvent($hookEvent)) {
                 foreach ($tasks as $task) {
                     $this->taskRunner->enqueue($task);
@@ -102,7 +102,7 @@ class Server
 
         $this->httpServer->on('error', function ($error) {
             $message = $error instanceof \Exception ? $error->getMessage() : var_export($error, true);
-            $this->logger->error($message);
+            $this->logger->error($message, (array) $error);
         });
 
         $this->httpServer->listen($this->socketServer);

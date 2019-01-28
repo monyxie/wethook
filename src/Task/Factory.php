@@ -2,7 +2,8 @@
 
 namespace Monyxie\Wethook\Task;
 
-use Monyxie\Wethook\Driver\HookEvent;
+use Monyxie\Wethook\Driver\Event;
+use Monyxie\Wethook\Driver\EventInterface;
 
 /**
  * Task factory.
@@ -25,18 +26,18 @@ class Factory
     }
 
     /**
-     * @param HookEvent $hookEvent
+     * @param Event $hookEvent
      * @return Task[]
      */
-    public function fromHookEvent(HookEvent $hookEvent)
+    public function fromHookEvent(Event $hookEvent)
     {
         $tasks = [];
 
         $env = [
-            'wh.driver' => $hookEvent->driver,
-            'wh.event' => $hookEvent->event,
-            'wh.target' => $hookEvent->target,
-            'wh.data' => $hookEvent->data,
+            'wh.driver' => $hookEvent->getDriver(),
+            'wh.event' => $hookEvent->getEvent(),
+            'wh.target' => $hookEvent->getTarget(),
+            'wh.data' => $hookEvent->getData(),
         ];
 
         foreach ($this->tasks as $item) {
@@ -53,20 +54,20 @@ class Factory
     }
 
     /**
-     * @param HookEvent $hookEvent
+     * @param EventInterface $hookEvent
      * @param $definition
      * @return bool
      */
-    private function matchDefinition(HookEvent $hookEvent, $definition): bool
+    private function matchDefinition(EventInterface $hookEvent, $definition): bool
     {
         if (isset($definition['when']['driver'])) {
-            if ($hookEvent->driver !== $definition['when']['driver']) return false;
+            if ($hookEvent->getDriver() !== $definition['when']['driver']) return false;
         }
         if (isset($definition['when']['event'])) {
-            if ($hookEvent->event !== $definition['when']['event']) return false;
+            if ($hookEvent->getEvent() !== $definition['when']['event']) return false;
         }
         if (isset($definition['when']['target'])) {
-            if ($hookEvent->target !== $definition['when']['target']) return false;
+            if ($hookEvent->getTarget() !== $definition['when']['target']) return false;
         }
 
         return true;

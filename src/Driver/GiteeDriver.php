@@ -44,21 +44,22 @@ class GiteeDriver implements DriverInterface
      */
     public function handle(ServerRequestInterface $request, ResponseInterface $response): Result
     {
-        $bodyData = json_decode($request->getBody());
+        $bodyData = json_decode($request->getBody(), true);
 
-        if ($bodyData === null || !isset($bodyData->password) || !isset($bodyData->project->path_with_namespace) || !isset($bodyData->hook_name)) {
+        if ($bodyData === null || !isset($bodyData['password']) || !isset($bodyData['project']['url']) || !isset($bodyData['hook_name'])) {
             throw new DriverException('Malformed request.');
         }
 
-        if ($this->password && $bodyData->password !== $this->password) {
+        if ($this->password && $bodyData['password'] !== $this->password) {
             throw new DriverException('Password mismatch.');
         }
 
-        $event = new HookEvent();
-        $event->driver = $this->getIdentifier();
-        $event->event = $bodyData->hook_name;
-        $event->target = $bodyData->project->path_with_namespace;
-        $event->data = $bodyData;
+        $event = new Event(
+            $this->getIdentifier(),
+            $bodyData['hook_name'],
+            $bodyData['project']['url'],
+            $bodyData
+        );
 
         return new Result($response, $event);
     }

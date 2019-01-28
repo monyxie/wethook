@@ -45,29 +45,30 @@ class GiteaDriver implements DriverInterface
     public function handle(ServerRequestInterface $request, ResponseInterface $response): Result
     {
 
-        $bodyData = json_decode($request->getBody());
+        $bodyData = json_decode($request->getBody(), true);
 
         $eventValues = $request->getHeader('X-Gitea-Event');
         $eventName = $eventValues ? end($eventValues) : null;
 
         if (
             $bodyData === null
-            || !isset($bodyData->secret)
-            || !isset($bodyData->repository->full_name)
+            || !isset($bodyData['secret'])
+            || !isset($bodyData['repository']['html_url'])
             || empty($eventName)
         ) {
             throw new DriverException('Malformed request.');
         }
 
-        if ($this->secret && $this->secret !== $bodyData->secret) {
+        if ($this->secret && $this->secret !== $bodyData['secret']) {
             throw new DriverException('Secret mismatch.');
         }
 
-        $event = new HookEvent();
-        $event->driver = $this->getIdentifier();
-        $event->event = $eventName;
-        $event->target = $bodyData->repository->full_name;
-        $event->data = $bodyData;
+        $event = new Event(
+            $this->getIdentifier(),
+            $eventName,
+            $bodyData['repository']['html_url'],
+            $bodyData
+        );
 
         return new Result($response, $event);
     }

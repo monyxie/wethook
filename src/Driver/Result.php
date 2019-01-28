@@ -14,11 +14,11 @@ class Result
     private $response;
 
     /**
-     * @var HookEvent
+     * @var EventInterface
      */
     private $event;
 
-    public function __construct(ResponseInterface $response, HookEvent $event)
+    public function __construct(ResponseInterface $response, EventInterface $event)
     {
         $this->response = $response;
         $this->event = $event;
@@ -33,9 +33,9 @@ class Result
     }
 
     /**
-     * @return HookEvent
+     * @return EventInterface
      */
-    public function getEvent(): HookEvent
+    public function getEvent(): EventInterface
     {
         return $this->event;
     }
