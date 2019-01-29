@@ -49,7 +49,8 @@ class Task
     /**
      * @return array
      */
-    public function getEnvironment() {
+    public function getEnvironment()
+    {
         return $this->environment;
     }
 }

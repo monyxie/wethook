@@ -1,7 +1,5 @@
 <?php
 
-use function DI\create;
-use function DI\get;
 use League\Plates\Engine as TemplateEngine;
 use Monolog\Logger;
 use Monyxie\Wethook\Driver\GiteaDriver;
@@ -15,6 +13,8 @@ use React\EventLoop\Factory as LoopFactory;
 use React\EventLoop\LoopInterface;
 use React\Http\Server as HttpServer;
 use React\Socket\Server as SocketServer;
+use function DI\create;
+use function DI\get;
 
 
 return [

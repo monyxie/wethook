@@ -6,12 +6,9 @@ use Monyxie\Wethook\Driver\Event;
 use Monyxie\Wethook\Driver\Registry;
 use Monyxie\Wethook\Task\Factory;
 use Monyxie\Wethook\Task\Runner;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use React\Http\Server as HttpServer;
 use React\Socket\Server as SocketServer;
-use function RingCentral\Psr7\stream_for;
 
 /**
  * Class Server
@@ -102,7 +99,7 @@ class Server
 
         $this->httpServer->on('error', function ($error) {
             $message = $error instanceof \Exception ? $error->getMessage() : var_export($error, true);
-            $this->logger->error($message, (array) $error);
+            $this->logger->error($message, (array)$error);
         });
 
         $this->httpServer->listen($this->socketServer);

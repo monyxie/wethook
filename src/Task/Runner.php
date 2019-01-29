@@ -203,7 +203,7 @@ class Runner implements EventEmitterInterface
     {
         $results = [];
         foreach ($this->results as $result) {
-            $results []= $result;
+            $results [] = $result;
         }
 
         return $results;

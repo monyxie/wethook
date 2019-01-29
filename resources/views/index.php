@@ -13,6 +13,7 @@
             border-collapse: collapse;
             font-family: monospace;
         }
+
         th, td {
             border: 1px solid black;
             padding: 0 1em;
@@ -24,24 +25,24 @@
 <table>
     <tbody>
     <?php foreach ($fields as $field): ?>
-    <tr>
-        <th title="<?= $this->e($field['title']) ?>"><?= $this->e($field['name']) ?></th>
-        <td><?= $this->e($field['value']) ?></td>
-    </tr>
+        <tr>
+            <th title="<?= $this->e($field['title']) ?>"><?= $this->e($field['name']) ?></th>
+            <td><?= $this->e($field['value']) ?></td>
+        </tr>
     <?php endforeach; ?>
     </tbody>
 </table>
 <p>Recent tasks</p>
 <table>
     <thead>
-        <tr>
-            <th>Started At</th>
-            <th>Finished At</th>
-            <th>Command</th>
-            <th>Working Directory</th>
-            <th>Exit Code</th>
-            <th>Output</th>
-        </tr>
+    <tr>
+        <th>Started At</th>
+        <th>Finished At</th>
+        <th>Command</th>
+        <th>Working Directory</th>
+        <th>Exit Code</th>
+        <th>Output</th>
+    </tr>
     </thead>
     <tbody>
     <?php foreach ($results as $result): ?>

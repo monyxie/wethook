@@ -10,7 +10,7 @@ return [
             'when' => [
                 'driver' => 'gitea',
                 'event' => 'push',
-                'target' => 'monyxie/wethook',
+                'target' => 'http://git.jianzhibox.cn/zhitubao/api-enterprise.zmeng',
             ],
             'where' => ['/outside/code/wethook'],
             'what' => ['git pull', 'npm install'],
