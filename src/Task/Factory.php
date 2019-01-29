@@ -26,22 +26,22 @@ class Factory
     }
 
     /**
-     * @param Event $event
+     * @param Event $hookEvent
      * @return Task[]
      */
-    public function fromDriverEvent(Event $event)
+    public function fromDriverEvent(Event $hookEvent)
     {
         $tasks = [];
 
         $env = [
-            'wh.driver' => $event->getDriver(),
-            'wh.event' => $event->getEvent(),
-            'wh.target' => $event->getTarget(),
-            'wh.data' => $event->getData(),
+            'wh.driver' => $hookEvent->getDriver(),
+            'wh.event' => $hookEvent->getEvent(),
+            'wh.target' => $hookEvent->getTarget(),
+            'wh.data' => $hookEvent->getData(),
         ];
 
         foreach ($this->tasks as $item) {
-            if ($this->matchDefinition($event, $item)) {
+            if ($this->matchDefinition($hookEvent, $item)) {
                 foreach ($item['where'] as $dir) {
                     foreach ($item['what'] as $cmd) {
                         $tasks [] = new Task($cmd, $dir, $env);
