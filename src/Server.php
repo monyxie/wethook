@@ -1,11 +1,13 @@
 <?php
 
-namespace Monyxie\Wethook\Http;
+namespace Monyxie\Wethook;
 
 use Monyxie\Wethook\Driver\Event;
 use Monyxie\Wethook\Driver\Registry;
+use Monyxie\Wethook\Http\Router;
+use Monyxie\Wethook\Http\WebUi;
 use Monyxie\Wethook\Task\Factory;
-use Monyxie\Wethook\Task\Runner;
+use Monyxie\Wethook\Task\RunnerInterface;
 use Psr\Log\LoggerInterface;
 use React\Http\Server as HttpServer;
 use React\Socket\Server as SocketServer;
@@ -30,7 +32,7 @@ class Server
      */
     private $registry;
     /**
-     * @var Runner
+     * @var RunnerInterface
      */
     private $taskRunner;
     /**
@@ -49,6 +51,10 @@ class Server
      * @var WebUi
      */
     private $webUi;
+    /**
+     * @var Monitor
+     */
+    private $monitor;
 
     /**
      * Server constructor.
@@ -57,9 +63,10 @@ class Server
      * @param SocketServer $socketServer
      * @param Registry $registry
      * @param Factory $factory
-     * @param Runner $taskRunner
+     * @param RunnerInterface $taskRunner
      * @param Router $router
      * @param WebUi $webUi
+     * @param Monitor $monitor
      */
     public function __construct(
         LoggerInterface $logger,
@@ -67,9 +74,10 @@ class Server
         SocketServer $socketServer,
         Registry $registry,
         Factory $factory,
-        Runner $taskRunner,
+        RunnerInterface $taskRunner,
         Router $router,
-        WebUi $webUi
+        WebUi $webUi,
+        Monitor $monitor
     )
     {
         $this->logger = $logger;
@@ -80,6 +88,7 @@ class Server
         $this->socketServer = $socketServer;
         $this->router = $router;
         $this->webUi = $webUi;
+        $this->monitor = $monitor;
     }
 
     /**
@@ -87,10 +96,12 @@ class Server
      */
     public function run()
     {
+        $this->monitor->monitorRegistry($this->registry);
+        $this->monitor->monitorRunner($this->taskRunner);
         $this->webUi->addRoutes($this->router);
         $this->registry->addRoutes($this->router);
         $this->registry->on('hook', function (Event $hookEvent) {
-            if ($tasks = $this->taskFactory->fromHookEvent($hookEvent)) {
+            if ($tasks = $this->taskFactory->fromDriverEvent($hookEvent)) {
                 foreach ($tasks as $task) {
                     $this->taskRunner->enqueue($task);
                 }

@@ -42,5 +42,5 @@ if (file_exists(PATH_CONFIG . '/config.php')) {
 $builder->addDefinitions($defs);
 
 $container = $builder->build();
-$container->get(\Monyxie\Wethook\Http\Server::class)->run();
+$container->get(\Monyxie\Wethook\Server::class)->run();
 $container->get(\React\EventLoop\LoopInterface::class)->run();

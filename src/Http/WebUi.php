@@ -5,12 +5,9 @@ namespace Monyxie\Wethook\Http;
 
 
 use League\Plates\Engine as TemplateEngine;
-use Monyxie\Wethook\Driver\Registry;
-use Monyxie\Wethook\Task\Result;
-use Monyxie\Wethook\Task\Runner;
+use Monyxie\Wethook\Monitor;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use React\EventLoop\LoopInterface;
 use function RingCentral\Psr7\stream_for;
 
 class WebUi
@@ -20,33 +17,24 @@ class WebUi
      */
     private $engine;
     /**
-     * @var Runner
+     * @var Monitor
      */
-    private $runner;
-    /**
-     * @var Registry
-     */
-    private $registry;
-    /**
-     * @var LoopInterface
-     */
-    private $loop;
+    private $monitor;
 
     /**
      * WebUi constructor.
      * @param TemplateEngine $engine
-     * @param Runner $runner
-     * @param Registry $registry
-     * @param LoopInterface $loop
+     * @param Monitor $monitor
      */
-    public function __construct(TemplateEngine $engine, Runner $runner, Registry $registry, LoopInterface $loop)
+    public function __construct(TemplateEngine $engine, Monitor $monitor)
     {
         $this->engine = $engine;
-        $this->runner = $runner;
-        $this->registry = $registry;
-        $this->loop = $loop;
+        $this->monitor = $monitor;
     }
 
+    /**
+     * @param Router $router
+     */
     public function addRoutes(Router $router)
     {
         $router->addRoute('GET', '/', [$this, 'actionIndex']);
@@ -61,99 +49,107 @@ class WebUi
      */
     public function actionIndex(ServerRequestInterface $request, ResponseInterface $response)
     {
-        $drivers = [];
-        foreach ($this->registry as $driver) {
-            $drivers [] = $driver->getIdentifier();
-        }
-
-        $loopClassSegments = explode('\\', get_class($this->loop));
-        $loopClass = end($loopClassSegments);
-
         $data = [
             'fields' => [
                 [
                     'name' => 'Loop Class',
                     'title' => '',
-                    'value' => $loopClass,
+                    'value' => $this->monitor->getLoopClass(),
                 ],
                 [
                     'name' => 'Registered Drivers',
                     'title' => '',
-                    'value' => join(', ', $drivers),
+                    'value' => join(', ', $this->monitor->getRegisteredDrivers()),
                 ],
                 [
                     'name' => 'Runner Status',
                     'title' => '',
-                    'value' => $this->runner->isRunning() ? 'busy' : 'idle',
+                    'value' => $this->monitor->getRunnerStatus(),
                 ],
                 [
                     'name' => 'Enqueued Tasks',
                     'title' => '',
-                    'value' => $this->runner->getNumEnqueued(),
+                    'value' => $this->monitor->getEnqueuedTasks(),
                 ],
                 [
                     'name' => 'Finished Tasks',
                     'title' => '',
-                    'value' => $this->runner->getNumFinished(),
+                    'value' => $this->monitor->getFinishedTasks(),
                 ],
                 [
                     'name' => 'Latest Enqueued',
                     'title' => '',
-                    'value' => $this->runner->getLatestEnqueuedAt()
-                        ? date('Y-m-d H:i:s', $this->runner->getLatestEnqueuedAt())
+                    'value' => $this->monitor->getLastEnqueuedAt()
+                        ? date('Y-m-d H:i:s', $this->monitor->getLastEnqueuedAt())
                         : '-',
                 ],
                 [
                     'name' => 'Latest Finished',
                     'title' => '',
-                    'value' => $this->runner->getLatestFinishedAt()
-                        ? date('Y-m-d H:i:s', $this->runner->getLatestFinishedAt())
+                    'value' => $this->monitor->getLastFinishedAt()
+                        ? date('Y-m-d H:i:s', $this->monitor->getLastFinishedAt())
                         : '-',
                 ],
                 [
                     'name' => 'Mem Allocated',
                     'title' => '',
-                    'value' => $this->formatMemory(memory_get_usage(true)),
+                    'value' => $this->formatMemory($this->monitor->getMemAllocated()),
                 ],
                 [
                     'name' => 'Mem Usage',
                     'title' => '',
-                    'value' => $this->formatMemory(memory_get_usage(false)),
+                    'value' => $this->formatMemory($this->monitor->getMemUsage()),
                 ],
                 [
                     'name' => 'Running Since',
                     'title' => '',
-                    'value' => date('Y-m-d H:i:s', STARTUP_TIME),
+                    'value' => date('Y-m-d H:i:s', $this->monitor->getRunningSince()),
                 ],
             ],
-            'results' => array_map(function (Result $result) {
-                $task = $result->getTask();
+            'results' => array_map(function ($result) {
+                $task = $result['task'];
                 return [
-                    'startTime' => date('Y-m-d H:i:s', $result->getStartTime()),
-                    'finishTime' => date('Y-m-d H:i:s', $result->getFinishTime()),
-                    'command' => $task->getCommand(),
-                    'workingDirectory' => $task->getWorkingDirectory(),
-                    'exitCode' => $result->getExitCode(),
-                    'output' => $result->getOutput(),
-                    'outputBrief' => $this->truncateOutput($result->getOutput()),
+                    'startTime' => date('Y-m-d H:i:s', $result['startTime']),
+                    'finishTime' => date('Y-m-d H:i:s', $result['finishTime']),
+                    'command' => $task['command'],
+                    'workingDirectory' => $task['workingDirectory'],
+                    'exitCode' => $result['exitCode'],
+                    'output' => $result['output'] ?: var_export($result, true),
+                    'outputBrief' => $result['output'] ? $this->truncateOutput($result['output']) : '',
                 ];
-            }, array_reverse($this->runner->getResults())),
+            }, array_reverse($this->monitor->getRecentTasks())),
         ];
         return $response->withBody(stream_for($this->engine->render('index', $data)));
     }
 
+    /**
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @return ResponseInterface
+     * @internal
+     */
     public function actionFavicon(ServerRequestInterface $request, ResponseInterface $response)
     {
         return $response->withHeader('Content-Type', 'image/png')
             ->withBody(stream_for(base64_decode('iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAeElEQVQ4y61TWw6AIAxrF4+u564fhgShQ0GX8MEebVkDJcEFSVuQxFufA8iGHVAH0A7XjK4WM3LbOwBspTBiHkVgMQpBzDC6p8aK7Lovnha3tAMHkjllAXhAb+R/ciEFKOwjFb8qgKTuYJe6HKCr/Z5n9p0zF9olniImdOsXukmPAAAAAElFTkSuQmCC')));
     }
 
+    /**
+     * Formats memory usage to human-readable format.
+     * @param $size
+     * @return string
+     */
     private function formatMemory($size)
     {
         $unit = array('B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB');
         return @round($size / pow(1024, ($i = floor(log($size, 1024)))), 2) . ' ' . $unit[$i];
     }
 
+    /**
+     * Truncate long outputs.
+     * @param string $output
+     * @return string
+     */
     private function truncateOutput(string $output)
     {
         $output = trim($output);

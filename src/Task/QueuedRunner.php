@@ -2,7 +2,6 @@
 
 namespace Monyxie\Wethook\Task;
 
-use Evenement\EventEmitterInterface;
 use Evenement\EventEmitterTrait;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
@@ -10,9 +9,9 @@ use React\ChildProcess\Process;
 use React\EventLoop\LoopInterface;
 
 /**
- * Class Runner
+ * Class QueuedRunner
  */
-class Runner implements EventEmitterInterface
+class QueuedRunner implements RunnerInterface
 {
     use EventEmitterTrait;
 
@@ -20,22 +19,6 @@ class Runner implements EventEmitterInterface
      * @var bool Whether the task runner is running.
      */
     private $isRunning = false;
-    /**
-     * @var int Total number of tasks that have been enqueued.
-     */
-    private $numEnqueued = 0;
-    /**
-     * @var int Total number of tasks that have finished running.
-     */
-    private $numFinished = 0;
-    /**
-     * @var int The latest time a task was enqueued.
-     */
-    private $latestEnqueuedAt = 0;
-    /**
-     * @var int The latest time a task finished running.
-     */
-    private $latestFinishedAt = 0;
 
     /**
      * @var \SplQueue The queue.
@@ -51,12 +34,6 @@ class Runner implements EventEmitterInterface
     private $logger;
 
     /**
-     * Recent results.
-     * @var \SplQueue
-     */
-    private $results;
-
-    /**
      * Runner constructor.
      * @param LoopInterface $loop
      * @param LoggerInterface $logger
@@ -66,22 +43,21 @@ class Runner implements EventEmitterInterface
         $this->loop = $loop;
         $this->queue = new \SplQueue();
         $this->logger = $logger;
-        $this->results = new \SplQueue();
     }
 
     /**
-     * @param Task $task
+     * @inheritdoc
      */
-    public function enqueue(Task $task)
+    public function enqueue(Task $task): void
     {
         $this->queue->enqueue($task);
-        $this->numEnqueued++;
-        $this->latestEnqueuedAt = time();
+        $this->emit('enqueue', [(array)$task]);
 
         $this->logger->log(LogLevel::INFO, 'Task queued.', ['command' => $task->getCommand(), 'workingDirectory' => $task->getWorkingDirectory()]);
 
         if (!$this->isRunning) {
             $this->isRunning = true;
+            $this->emit('busy');
 
             $this->loop->addTimer(0, function () {
                 $this->run();
@@ -102,18 +78,17 @@ class Runner implements EventEmitterInterface
                 $this->runTask($task, $resume);
                 yield;
             }
+
             $this->isRunning = false;
+            $this->emit('idle');
         };
 
         $generator = $generatorMaker();
-        $resume = function (Result $result) use ($generator) {
-            $this->numFinished++;
-            $this->latestFinishedAt = time();
-
-            $this->results->enqueue($result);
-            if ($this->results->count() > 10) {
-                $this->results->dequeue();
-            }
+        $resume = function (Task $task, Result $result) use ($generator) {
+            $this->emit('finish', [
+                $task->toArray(),
+                $result->toArray(),
+            ]);
 
             $generator->next();
         };
@@ -129,6 +104,9 @@ class Runner implements EventEmitterInterface
      */
     private function runTask(Task $task, callable $onExit)
     {
+        $this->logger->log(LogLevel::INFO, 'Task started.', ['command' => $task->getCommand(), 'workingDirectory' => $task->getWorkingDirectory()]);
+        $this->emit('start', [(array)$task]);
+
         $startTime = time();
         $output = '';
         $appendOutput = function ($chunk) use (&$output) {
@@ -144,8 +122,8 @@ class Runner implements EventEmitterInterface
                 'exitCode' => $exitCode
             ]);
 
-            $result = new Result($task, $startTime, $finishTime, $exitCode, $output);
-            return call_user_func($onExit, $result);
+            $result = new Result($startTime, $finishTime, $exitCode, $output);
+            return call_user_func($onExit, $task, $result);
         };
 
         // TODO pass event data as environment variables
@@ -154,58 +132,5 @@ class Runner implements EventEmitterInterface
         $process->stdout->on('data', $appendOutput);
         $process->stderr->on('data', $appendOutput);
         $process->on('exit', $handleProcessExit);
-    }
-
-    /**
-     * @return bool
-     */
-    public function isRunning(): bool
-    {
-        return $this->isRunning;
-    }
-
-    /**
-     * @return int
-     */
-    public function getNumEnqueued(): int
-    {
-        return $this->numEnqueued;
-    }
-
-    /**
-     * @return int
-     */
-    public function getNumFinished(): int
-    {
-        return $this->numFinished;
-    }
-
-    /**
-     * @return int
-     */
-    public function getLatestEnqueuedAt(): int
-    {
-        return $this->latestEnqueuedAt;
-    }
-
-    /**
-     * @return int
-     */
-    public function getLatestFinishedAt(): int
-    {
-        return $this->latestFinishedAt;
-    }
-
-    /**
-     * @return array
-     */
-    public function getResults(): array
-    {
-        $results = [];
-        foreach ($this->results as $result) {
-            $results [] = $result;
-        }
-
-        return $results;
     }
 }

@@ -9,10 +9,6 @@ namespace Monyxie\Wethook\Task;
 class Result
 {
     /**
-     * @var Task
-     */
-    private $task;
-    /**
      * @var int
      */
     private $exitCode;
@@ -31,27 +27,17 @@ class Result
 
     /**
      * Task constructor.
-     * @param Task $task
      * @param int $startTime
      * @param int $finishTime
      * @param int $exitCode
      * @param string $output
      */
-    public function __construct(Task $task, int $startTime, int $finishTime, int $exitCode, string $output)
+    public function __construct(int $startTime, int $finishTime, int $exitCode, string $output)
     {
-        $this->task = $task;
         $this->startTime = $startTime;
         $this->finishTime = $finishTime;
         $this->exitCode = $exitCode;
         $this->output = $output;
-    }
-
-    /**
-     * @return Task
-     */
-    public function getTask(): Task
-    {
-        return $this->task;
     }
 
     /**
@@ -84,5 +70,18 @@ class Result
     public function getFinishTime(): int
     {
         return $this->finishTime;
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray()
+    {
+        return [
+            'startTime' => $this->getStartTime(),
+            'finishTime' => $this->getFinishTime(),
+            'exitCode' => $this->getExitCode(),
+            'output' => $this->getOutput(),
+        ];
     }
 }

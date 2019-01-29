@@ -53,4 +53,16 @@ class Task
     {
         return $this->environment;
     }
+
+    /**
+     * @return array
+     */
+    public function toArray()
+    {
+        return [
+            'command' => $this->getCommand(),
+            'workingDirectory' => $this->getWorkingDirectory(),
+            'environment' => $this->getEnvironment()
+        ];
+    }
 }
