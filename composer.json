@@ -9,7 +9,8 @@
         "docopt/docopt": "^1.0",
         "ext-json": "*",
         "league/plates": "3.*",
-        "ext-mbstring": "*"
+        "ext-mbstring": "*",
+        "symfony/process": "^4.2"
     },
     "autoload": {
         "psr-4": {
