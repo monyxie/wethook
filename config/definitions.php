@@ -8,8 +8,8 @@ use Monyxie\Wethook\Driver\Registry;
 use Monyxie\Wethook\Http\LoggingMiddleware;
 use Monyxie\Wethook\Http\Router;
 use Monyxie\Wethook\Task\Factory as TaskFactory;
-use Monyxie\Wethook\Task\QueuedRunner;
-use Monyxie\Wethook\Task\RunnerInterface;
+use Monyxie\Wethook\Task\Runner\AsynchronousRunner;
+use Monyxie\Wethook\Task\Runner\RunnerInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\Factory as LoopFactory;
 use React\EventLoop\LoopInterface;
@@ -44,5 +44,5 @@ return [
         ->constructor(get('gitee.password')),
     TemplateEngine::class => create(TemplateEngine::class)
         ->constructor(PATH_ROOT . '/resources/views'),
-    RunnerInterface::class => autowire(QueuedRunner::class),
+    RunnerInterface::class => autowire(AsynchronousRunner::class),
 ];
