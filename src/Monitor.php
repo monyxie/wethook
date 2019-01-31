@@ -5,7 +5,7 @@ namespace Monyxie\Wethook;
 
 
 use Monyxie\Wethook\Driver\Registry;
-use Monyxie\Wethook\Task\RunnerInterface;
+use Monyxie\Wethook\Task\Runner\RunnerInterface;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\TimerInterface;
 

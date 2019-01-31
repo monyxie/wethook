@@ -1,9 +1,10 @@
 <?php
 
-namespace Monyxie\Wethook\Task;
+namespace Monyxie\Wethook\Task\Runner;
 
 
 use Evenement\EventEmitterInterface;
+use Monyxie\Wethook\Task\Task;
 
 /**
  * Class RunnerInterface

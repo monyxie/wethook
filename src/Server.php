@@ -7,7 +7,7 @@ use Monyxie\Wethook\Driver\Registry;
 use Monyxie\Wethook\Http\Router;
 use Monyxie\Wethook\Http\WebUi;
 use Monyxie\Wethook\Task\Factory;
-use Monyxie\Wethook\Task\RunnerInterface;
+use Monyxie\Wethook\Task\Runner\RunnerInterface;
 use Psr\Log\LoggerInterface;
 use React\Http\Server as HttpServer;
 use React\Socket\Server as SocketServer;
@@ -32,7 +32,7 @@ class Server
      */
     private $registry;
     /**
-     * @var RunnerInterface
+     * @var \Monyxie\Wethook\Task\Runner\RunnerInterface
      */
     private $taskRunner;
     /**
@@ -63,7 +63,7 @@ class Server
      * @param SocketServer $socketServer
      * @param Registry $registry
      * @param Factory $factory
-     * @param RunnerInterface $taskRunner
+     * @param \Monyxie\Wethook\Task\Runner\RunnerInterface $taskRunner
      * @param Router $router
      * @param WebUi $webUi
      * @param Monitor $monitor
