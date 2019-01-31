@@ -2,6 +2,7 @@
 
 require(__DIR__ . '/vendor/autoload.php');
 
+define('IS_WINDOWS', substr(PHP_OS, 0, 3) === 'WIN');
 define('STARTUP_TIME', time());
 define('VERSION', '0.1');
 define('PATH_ROOT', __DIR__);
@@ -41,6 +42,18 @@ if (file_exists(PATH_CONFIG . '/config.php')) {
 }
 $builder->addDefinitions($defs);
 
+if (IS_WINDOWS) {
+    $builder->addDefinitions([
+        Monyxie\Wethook\Task\Runner\RunnerInterface::class =>
+            \DI\autowire(Monyxie\Wethook\Task\Runner\SynchronousRunner::class),
+    ]);
+}
+
 $container = $builder->build();
+
+if (IS_WINDOWS) {
+    $container->get(\Psr\Log\LoggerInterface::class)
+        ->warning('Running on Windows has severe performance issues and is for experiments only.');
+}
 $container->get(\Monyxie\Wethook\Server::class)->run();
 $container->get(\React\EventLoop\LoopInterface::class)->run();
