@@ -1,6 +1,9 @@
 This is _wethook_, a webhook-triggered task runner.
 
 ### Usage
+#### Requirements
+  * PHP >= 7.1
+  * Linux (Other POSIX OS may also work)
 #### Running the server
 ```
 php wethook.php
