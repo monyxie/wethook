@@ -19,7 +19,7 @@ In order to make modifications take effect, the server must be restarted.
 
 The file `config/config.php.dist` may serve as an example or template. 
 
-### Writing hook scripts
+#### Writing hook scripts
 Writing hook scripts is the same as writing any other scripts. The following environment variables are available:
   * `WETHOOK_DRIVER` The identifier of the driver.
   * `WETHOOK_EVENT` The name of the event.
