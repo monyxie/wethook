@@ -21,7 +21,7 @@ Writing hook scripts is the same as writing any other scripts. The following env
   * `WETHOOK_DRIVER` The identifier of the driver.
   * `WETHOOK_EVENT` The name of the event.
   * `WETHOOK_TARGET` The URL of the target resource that triggered the event.
-  * `WETHOOK_DATA` Any other data the event may carry, as a JSON serialized string.
+  * `WETHOOK_DATA` Any other data the event may carry, as a JSON string.
 
 ### TODO
   * Enqueue tasks in different queues according to their working directories.
