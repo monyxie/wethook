@@ -34,10 +34,10 @@ class Factory
         $tasks = [];
 
         $env = [
-            'wh.driver' => $hookEvent->getDriver(),
-            'wh.event' => $hookEvent->getEvent(),
-            'wh.target' => $hookEvent->getTarget(),
-            'wh.data' => $hookEvent->getData(),
+            'WETHOOK_DRIVER' => $hookEvent->getDriver(),
+            'WETHOOK_EVENT' => $hookEvent->getEvent(),
+            'WETHOOK_TARGET' => $hookEvent->getTarget(),
+            'WETHOOK_DATA' => json_encode($hookEvent->getData()),
         ];
 
         foreach ($this->tasks as $item) {

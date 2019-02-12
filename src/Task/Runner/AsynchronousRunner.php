@@ -128,8 +128,7 @@ class AsynchronousRunner implements RunnerInterface
             return call_user_func($onExit, $task, $result);
         };
 
-        // TODO pass event data as environment variables
-        $process = new Process($task->getCommand(), $task->getWorkingDirectory(), null);
+        $process = new Process($task->getCommand(), $task->getWorkingDirectory(), $task->getEnvironment());
         $process->start($this->loop);
         $process->stdout->on('data', $appendOutput);
         $process->stderr->on('data', $appendOutput);

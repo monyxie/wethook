@@ -104,8 +104,7 @@ class SynchronousRunner implements RunnerInterface
         $startTime = time();
         $output = '';
 
-        // TODO pass event data as environment variables
-        $process = Process::fromShellCommandline($task->getCommand(), $task->getWorkingDirectory(), null);
+        $process = Process::fromShellCommandline($task->getCommand(), $task->getWorkingDirectory(), $task->getEnvironment());
         $exitCode = $process->run(function ($type, $chunk) use (&$output) {
             $output .= $chunk;
         });
