@@ -25,7 +25,7 @@ The file `config/config.php.dist` may serve as an example or template.
 
 
 #### Drivers
-Webhook requests come in different formats. Drivers handle those differences and produce uniformed results. Currently these drivers are built-in:
+Webhook requests come in different formats. Drivers handle those differences and produce uniform results. Currently these drivers are built-in:
   * Gitea
   * Gitee
   * Github
