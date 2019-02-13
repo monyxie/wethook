@@ -23,6 +23,13 @@ In order to make modifications take effect, the server must be restarted.
 
 The file `config/config.php.dist` may serve as an example or template. 
 
+
+#### Drivers
+Webhook requests come in different formats. Drivers handle those differences and produce uniformed results. Currently these drivers are built-in:
+  * Gitea
+  * Gitee
+  * Github
+
 #### Writing hook scripts
 Writing hook scripts is the same as writing any executable scripts. The following environment variables are available:
   * `WETHOOK_DRIVER` The identifier of the driver.
