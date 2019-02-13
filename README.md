@@ -3,7 +3,11 @@ This is _wethook_, a webhook-triggered task runner.
 ### Usage
 #### Requirements
   * PHP >= 7.1
+  * ext-mbstring
   * Linux (Other POSIX OS may also work)
+
+Extensions that are enabled by default are omitted.
+
 #### Running the server
 ```
 php wethook.php
@@ -20,7 +24,7 @@ In order to make modifications take effect, the server must be restarted.
 The file `config/config.php.dist` may serve as an example or template. 
 
 #### Writing hook scripts
-Writing hook scripts is the same as writing any other scripts. The following environment variables are available:
+Writing hook scripts is the same as writing any executable scripts. The following environment variables are available:
   * `WETHOOK_DRIVER` The identifier of the driver.
   * `WETHOOK_EVENT` The name of the event.
   * `WETHOOK_TARGET` The URL of the target resource that triggered the event.
