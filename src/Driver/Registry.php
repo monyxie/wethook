@@ -48,7 +48,7 @@ class Registry implements EventEmitterInterface, \IteratorAggregate
      * Add routes to a HTTP router according to registered drivers.
      * @param Router $router
      */
-    public function addRoutes(Router $router)
+    public function registerRoutes(Router $router)
     {
         foreach ($this->drivers as $identifier => $driver) {
             $router->addRoute('*', '/' . $identifier, function (ServerRequestInterface $request, ResponseInterface $response) use ($identifier, $driver) {

@@ -98,8 +98,8 @@ class Server
     {
         $this->monitor->monitorRegistry($this->registry);
         $this->monitor->monitorRunner($this->taskRunner);
-        $this->webUi->addRoutes($this->router);
-        $this->registry->addRoutes($this->router);
+        $this->webUi->registerRoutes($this->router);
+        $this->registry->registerRoutes($this->router);
         $this->registry->on('hook', function (Event $hookEvent) {
             if ($tasks = $this->taskFactory->fromDriverEvent($hookEvent)) {
                 foreach ($tasks as $task) {

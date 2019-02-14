@@ -35,7 +35,7 @@ class WebUi
     /**
      * @param Router $router
      */
-    public function addRoutes(Router $router)
+    public function registerRoutes(Router $router)
     {
         $router->addRoute('GET', '/', [$this, 'actionIndex']);
         $router->addRoute('GET', '/favicon.ico', [$this, 'actionFavicon']);

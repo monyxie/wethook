@@ -209,7 +209,4 @@ class Monitor
     {
         return $this->runningSince;
     }
-
-
-
 }
