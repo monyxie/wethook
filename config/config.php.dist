@@ -4,6 +4,7 @@ return [
     'listen' => '127.0.0.1:7007',
     'gitea.secret' => '733tD00d',
     'gitee.password' => 'P455w0rd',
+    'github.secret' => 'GEETHAAB',
 
     'tasks' => [
         [
