@@ -1,4 +1,4 @@
-This is _wethook_, a webhook-triggered task runner.
+This is _wethook_, a webhook receiver and task runner.
 
 ### Usage
 #### Requirements
@@ -29,6 +29,7 @@ Webhook requests come in different formats. Drivers handle those differences and
   * Gitea
   * Gitee
   * Github
+  * Gitlab
 
 #### Writing hook scripts
 Writing hook scripts is the same as writing any executable scripts. The following environment variables are available:
