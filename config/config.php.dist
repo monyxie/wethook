@@ -2,20 +2,50 @@
 
 return [
     'listen' => '127.0.0.1:7007',
-    'gitea.secret' => '733tD00d',
-    'gitee.password' => 'P455w0rd',
-    'github.secret' => 'GEETHAAB',
-    'gitlab.secret' => 'GitlabSecret',
+
+    'endpoints' => [
+        'gitea' => [
+            'driver' => 'gitea',
+            'password' => '733tD00d',
+        ],
+        'gitee' => [
+            'driver' => 'gitee',
+            'password' => 'P455w0rd',
+        ],
+        'github' => [
+            'driver' => 'github',
+            'password' => 'GEETHAAB',
+        ],
+        'gitlab' => [
+            'driver' => 'gitlab',
+            'password' => 'GitlabSecret',
+        ],
+        'another_gitlab' => [
+            'driver' => 'gitlab',
+            'password' => 'GitlabSecret2',
+        ],
+    ],
 
     'tasks' => [
         [
             'when' => [
+                'endpoint' => 'gitea',
                 'driver' => 'gitea',
                 'event' => 'push',
-                'target' => 'http://git.jianzhibox.cn/zhitubao/api-enterprise.zmeng',
+                'target' => 'http://git.example.com/example/project',
             ],
-            'where' => ['/outside/code/wethook'],
-            'what' => ['git pull', 'npm install'],
+            'where' => ['E:\code\wethook'],
+            'what' => ['git pull', 'git status', 'echo "$WETHOOK_DATA"'],
+        ],
+        [
+            'when' => [
+                'endpoint' => 'gitea',
+                'driver' => 'gitlab',
+                'event' => 'Push Hook',
+                'target' => 'http://example.com/mike/diaspora',
+            ],
+            'where' => ['E:\code\wethook'],
+            'what' => ['git pull', 'git status', 'echo "$WETHOOK_DATA"'],
         ]
     ]
 ];

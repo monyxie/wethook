@@ -5,6 +5,11 @@ namespace Monyxie\Wethook\Driver;
 interface EventInterface
 {
     /**
+     * @return string The endpoint that received the webhook request.
+     */
+    public function getEndpoint(): string;
+
+    /**
      * @return string The identifier of the driver.
      */
     public function getDriver(): string;

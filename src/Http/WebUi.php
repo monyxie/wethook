@@ -62,6 +62,11 @@ class WebUi
                     'value' => join(', ', $this->monitor->getRegisteredDrivers()),
                 ],
                 [
+                    'name' => 'Registered Endpoints',
+                    'title' => '',
+                    'value' => join(', ', $this->monitor->getRegisteredEndpoints()),
+                ],
+                [
                     'name' => 'Runner Status',
                     'title' => '',
                     'value' => $this->monitor->getRunnerStatus(),
@@ -123,18 +128,6 @@ class WebUi
     }
 
     /**
-     * @param ServerRequestInterface $request
-     * @param ResponseInterface $response
-     * @return ResponseInterface
-     * @internal
-     */
-    public function actionFavicon(ServerRequestInterface $request, ResponseInterface $response)
-    {
-        return $response->withHeader('Content-Type', 'image/png')
-            ->withBody(stream_for(base64_decode('iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAeElEQVQ4y61TWw6AIAxrF4+u564fhgShQ0GX8MEebVkDJcEFSVuQxFufA8iGHVAH0A7XjK4WM3LbOwBspTBiHkVgMQpBzDC6p8aK7Lovnha3tAMHkjllAXhAb+R/ciEFKOwjFb8qgKTuYJe6HKCr/Z5n9p0zF9olniImdOsXukmPAAAAAElFTkSuQmCC')));
-    }
-
-    /**
      * Formats memory usage to human-readable format.
      * @param $size
      * @return string
@@ -168,5 +161,17 @@ class WebUi
         $output = mb_substr($output, 0, $numKeep);
         $output .= '...(' . ($len - $numKeep) . ' more)';
         return trim($output);
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @return ResponseInterface
+     * @internal
+     */
+    public function actionFavicon(ServerRequestInterface $request, ResponseInterface $response)
+    {
+        return $response->withHeader('Content-Type', 'image/png')
+            ->withBody(stream_for(base64_decode('iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAeElEQVQ4y61TWw6AIAxrF4+u564fhgShQ0GX8MEebVkDJcEFSVuQxFufA8iGHVAH0A7XjK4WM3LbOwBspTBiHkVgMQpBzDC6p8aK7Lovnha3tAMHkjllAXhAb+R/ciEFKOwjFb8qgKTuYJe6HKCr/Z5n9p0zF9olniImdOsXukmPAAAAAElFTkSuQmCC')));
     }
 }

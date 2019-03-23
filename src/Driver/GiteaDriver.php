@@ -8,6 +8,7 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class GiteaDriver implements DriverInterface
 {
+    private $endpoint;
     /**
      * @var string
      */
@@ -15,25 +16,20 @@ class GiteaDriver implements DriverInterface
 
     /**
      * GiteaDriver constructor.
-     * @param $secret
+     * @param string $endpoint
+     * @param array $config
      */
-    public function __construct($secret)
+    public function __construct(string $endpoint, array $config)
     {
-        $this->secret = $secret;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getIdentifier(): string
-    {
-        return 'gitea';
+        $this->secret = isset($config['password']) ? $config['password'] : null;
+        $this->endpoint = $endpoint;
     }
 
     /**
      * @return array
      */
-    public function getEvents(): array {
+    public function getEvents(): array
+    {
         return [
             'push' => 'When commits are pushed to the repository.'
         ];
@@ -64,6 +60,7 @@ class GiteaDriver implements DriverInterface
         }
 
         $event = new Event(
+            $this->getEndpoint(),
             $this->getIdentifier(),
             $eventName,
             $bodyData['repository']['html_url'],
@@ -71,5 +68,21 @@ class GiteaDriver implements DriverInterface
         );
 
         return new Result($response, $event);
+    }
+
+    /**
+     * @return string
+     */
+    public function getEndpoint(): string
+    {
+        return $this->endpoint;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getIdentifier(): string
+    {
+        return 'gitea';
     }
 }

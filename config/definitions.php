@@ -17,17 +17,23 @@ use React\EventLoop\Factory as LoopFactory;
 use React\EventLoop\LoopInterface;
 use React\Http\Server as HttpServer;
 use React\Socket\Server as SocketServer;
-use function DI\create;
-use function DI\get;
 use function DI\autowire;
+use function DI\create;
+use function DI\decorate;
+use function DI\get;
 
 
 return [
     'listen' => '127.0.0.1:7007',
-    'gitea.secret' => '733tD00d',
-    'gitee.password' => 'P455w0rd',
-    'github.secret' => 'GEETHAAB',
+    'endpoints' => [],
     'tasks' => [],
+
+    'driver_aliases' => [
+        'gitea' => GiteaDriver::class,
+        'gitee' => GiteeDriver::class,
+        'github' => GithubDriver::class,
+        'gitlab' => GitlabDriver::class,
+    ],
 
     LoopInterface::class => LoopFactory::create(),
     LoggerInterface::class => create(Logger::class)
@@ -42,18 +48,21 @@ return [
         ->constructor(PATH_ROOT . '/resources/views'),
     RunnerInterface::class => autowire(AsynchronousRunner::class),
 
+    Registry::class => decorate(function (Registry $registry, \Psr\Container\ContainerInterface $container) {
+        $endpoints = $container->get('endpoints');
+        $aliases = $container->get('driver_aliases');
+        foreach ($endpoints as $identifier => $config) {
+            if (!isset($config['driver'])) {
+                throw new \Exception('Invalid driver configuration.');
+            }
 
-    Registry::class => autowire(Registry::class)
-        ->method('addDriver', get(GiteaDriver::class))
-        ->method('addDriver', get(GiteeDriver::class))
-        ->method('addDriver', get(GithubDriver::class))
-        ->method('addDriver', get(GitlabDriver::class)),
-    GiteaDriver::class => create(GiteaDriver::class)
-        ->constructor(get('gitea.secret')),
-    GiteeDriver::class => create(GiteeDriver::class)
-        ->constructor(get('gitee.password')),
-    GithubDriver::class => create(GithubDriver::class)
-        ->constructor(get('github.secret')),
-    GitlabDriver::class => create(GitlabDriver::class)
-        ->constructor(get('gitlab.token')),
+            if (isset($aliases[$config['driver']])) {
+                $config['driver'] = $aliases[$config['driver']];
+            }
+
+            $registry->addEndpoint($identifier, $config);
+        }
+
+        return $registry;
+    }),
 ];

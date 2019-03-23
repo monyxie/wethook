@@ -2,7 +2,6 @@
 
 namespace Monyxie\Wethook\Task;
 
-use Monyxie\Wethook\Driver\Event;
 use Monyxie\Wethook\Driver\EventInterface;
 
 /**
@@ -26,14 +25,15 @@ class Factory
     }
 
     /**
-     * @param Event $hookEvent
+     * @param EventInterface $hookEvent
      * @return Task[]
      */
-    public function fromDriverEvent(Event $hookEvent)
+    public function fromDriverEvent(EventInterface $hookEvent)
     {
         $tasks = [];
 
         $env = [
+            'WETHOOK_ENDPOINT' => $hookEvent->getEndpoint(),
             'WETHOOK_DRIVER' => $hookEvent->getDriver(),
             'WETHOOK_EVENT' => $hookEvent->getEvent(),
             'WETHOOK_TARGET' => $hookEvent->getTarget(),
@@ -60,6 +60,9 @@ class Factory
      */
     private function matchDefinition(EventInterface $hookEvent, $definition): bool
     {
+        if (isset($definition['when']['endpoint'])) {
+            if ($hookEvent->getEndpoint() !== $definition['when']['endpoint']) return false;
+        }
         if (isset($definition['when']['driver'])) {
             if ($hookEvent->getDriver() !== $definition['when']['driver']) return false;
         }

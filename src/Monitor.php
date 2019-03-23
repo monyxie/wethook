@@ -15,6 +15,7 @@ class Monitor
 
     private $loopClass = '';
     private $registeredDrivers = [];
+    private $registeredEndpoints = [];
     private $runnerStatus = 'idle';
     private $enqueuedTasks = 0;
     private $finishedTasks = 0;
@@ -54,7 +55,7 @@ class Monitor
         $this->memPeakAllocated = memory_get_peak_usage(true);
         $this->memPeakUsage = memory_get_peak_usage(false);
 
-        $this->timers['memory'] = $this->loop->addPeriodicTimer(5, function() {
+        $this->timers['memory'] = $this->loop->addPeriodicTimer(5, function () {
             $this->memAllocated = memory_get_usage(true);
             $this->memUsage = memory_get_usage(false);
             $this->memPeakAllocated = memory_get_peak_usage(true);
@@ -72,11 +73,14 @@ class Monitor
     public function monitorRegistry(Registry $registry)
     {
         $drivers = [];
+        $endpoints = [];
         foreach ($registry as $driver) {
-            $drivers [] = $driver->getIdentifier();
+            $drivers [$driver->getIdentifier()] = 1;
+            $endpoints [] = $driver->getEndpoint();
         }
 
-        $this->registeredDrivers = $drivers;
+        $this->registeredDrivers = array_keys($drivers);
+        $this->registeredEndpoints = $endpoints;
     }
 
     public function monitorRunner(RunnerInterface $runner)
@@ -91,7 +95,7 @@ class Monitor
             $this->finishedTasks++;
 
             $result['task'] = $task;
-            $this->recentTasks []= $result;
+            $this->recentTasks [] = $result;
             if (count($this->recentTasks) > 20) {
                 array_shift($this->recentTasks);
             }
@@ -117,9 +121,9 @@ class Monitor
     /**
      * @return array
      */
-    public function getRegisteredDrivers(): array
+    public function getRegisteredEndpoints(): array
     {
-        return $this->registeredDrivers;
+        return $this->registeredEndpoints;
     }
 
     /**
@@ -208,5 +212,13 @@ class Monitor
     public function getRunningSince(): int
     {
         return $this->runningSince;
+    }
+
+    /**
+     * @return array
+     */
+    public function getRegisteredDrivers(): array
+    {
+        return $this->registeredDrivers;
     }
 }

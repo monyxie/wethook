@@ -12,28 +12,27 @@ class GiteeDriver implements DriverInterface
      * @var string
      */
     private $password = '';
+    /**
+     * @var string
+     */
+    private $endpoint;
 
     /**
      * GiteeDriver constructor.
-     * @param $password
+     * @param string $endpoint
+     * @param array $config
      */
-    public function __construct($password)
+    public function __construct(string $endpoint, array $config)
     {
-        $this->password = $password;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getIdentifier(): string
-    {
-        return 'gitee';
+        $this->password = isset($config['password']) ? $config['password'] : null;
+        $this->endpoint = $endpoint;
     }
 
     /**
      * @return array
      */
-    public function getEvents(): array {
+    public function getEvents(): array
+    {
         return [
             'push_hooks' => 'When commits are pushed to the repository.'
         ];
@@ -55,6 +54,7 @@ class GiteeDriver implements DriverInterface
         }
 
         $event = new Event(
+            $this->getEndpoint(),
             $this->getIdentifier(),
             $bodyData['hook_name'],
             $bodyData['project']['url'],
@@ -62,5 +62,21 @@ class GiteeDriver implements DriverInterface
         );
 
         return new Result($response, $event);
+    }
+
+    /**
+     * @return string
+     */
+    public function getEndpoint(): string
+    {
+        return $this->endpoint;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getIdentifier(): string
+    {
+        return 'gitee';
     }
 }

@@ -7,6 +7,10 @@ class Event implements EventInterface
     /**
      * @var string
      */
+    protected $endpoint = '';
+    /**
+     * @var string
+     */
     protected $driver = '';
 
     /**
@@ -24,13 +28,23 @@ class Event implements EventInterface
      */
     protected $data = [];
 
+    /**
+     * Event constructor.
+     * @param string $endpoint
+     * @param string $driver
+     * @param string $event
+     * @param string $target
+     * @param array $data
+     */
     public function __construct(
+        string $endpoint = '',
         string $driver = '',
         string $event = '',
         string $target = '',
         array $data = []
     )
     {
+        $this->endpoint = $endpoint;
         $this->driver = $driver;
         $this->event = $event;
         $this->target = $target;
@@ -67,5 +81,13 @@ class Event implements EventInterface
     public function getData(): array
     {
         return $this->data;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEndpoint(): string
+    {
+        return $this->endpoint;
     }
 }

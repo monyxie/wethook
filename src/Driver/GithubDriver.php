@@ -12,28 +12,27 @@ class GithubDriver implements DriverInterface
      * @var string
      */
     private $secret;
+    /**
+     * @var string
+     */
+    private $endpoint;
 
     /**
      * GiteaDriver constructor.
-     * @param $secret
+     * @param string $endpoint
+     * @param array $config
      */
-    public function __construct($secret)
+    public function __construct(string $endpoint, array $config)
     {
-        $this->secret = $secret;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getIdentifier(): string
-    {
-        return 'github';
+        $this->secret = isset($config['password']) ? $config['password'] : null;
+        $this->endpoint = $endpoint;
     }
 
     /**
      * @return array
      */
-    public function getEvents(): array {
+    public function getEvents(): array
+    {
         return [
             'push' => 'When commits are pushed to the repository.'
         ];
@@ -66,6 +65,7 @@ class GithubDriver implements DriverInterface
         }
 
         $event = new Event(
+            $this->getEndpoint(),
             $this->getIdentifier(),
             $eventName,
             $bodyData['repository']['html_url'],
@@ -75,13 +75,30 @@ class GithubDriver implements DriverInterface
         return new Result($response, $event);
     }
 
-    private function validateSignature($signature, $secret, $body) {
+    private function validateSignature($signature, $secret, $body)
+    {
         $segments = explode('=', $signature);
-        if (! isset($segments[1])) {
+        if (!isset($segments[1])) {
             return false;
         }
 
         $expected = hash_hmac('sha1', $body, $secret);
         return $segments[1] === $expected;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEndpoint(): string
+    {
+        return $this->endpoint;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getIdentifier(): string
+    {
+        return 'github';
     }
 }

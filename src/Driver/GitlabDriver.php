@@ -12,28 +12,27 @@ class GitlabDriver implements DriverInterface
      * @var string
      */
     private $token;
+    /**
+     * @var string
+     */
+    private $endpoint;
 
     /**
      * GiteaDriver constructor.
-     * @param $token
+     * @param string $endpoint
+     * @param array $config
      */
-    public function __construct($token)
+    public function __construct(string $endpoint, array $config)
     {
-        $this->token = $token;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getIdentifier(): string
-    {
-        return 'gitlab';
+        $this->token = isset($config['password']) ? $config['password'] : null;
+        $this->endpoint = $endpoint;
     }
 
     /**
      * @return array
      */
-    public function getEvents(): array {
+    public function getEvents(): array
+    {
         return [
             'Push Hook' => 'When commits are pushed to the repository.'
         ];
@@ -66,6 +65,7 @@ class GitlabDriver implements DriverInterface
         }
 
         $event = new Event(
+            $this->getEndpoint(),
             $this->getIdentifier(),
             $eventName,
             $bodyData['project']['web_url'],
@@ -75,13 +75,19 @@ class GitlabDriver implements DriverInterface
         return new Result($response, $event);
     }
 
-    private function validateSignature($signature, $secret, $body) {
-        $segments = explode('=', $signature);
-        if (! isset($segments[1])) {
-            return false;
-        }
+    /**
+     * @return string
+     */
+    public function getEndpoint(): string
+    {
+        return $this->endpoint;
+    }
 
-        $expected = hash_hmac('sha1', $body, $secret);
-        return $segments[1] === $expected;
+    /**
+     * @inheritdoc
+     */
+    public function getIdentifier(): string
+    {
+        return 'gitlab';
     }
 }
