@@ -33,6 +33,7 @@ Webhook requests come in different formats. Drivers handle those differences and
 
 #### Writing hook scripts
 Writing hook scripts is the same as writing any executable scripts. The following environment variables are available:
+  * `WETHOOK_ENDPOINT` The endpoint that received the webhook request.
   * `WETHOOK_DRIVER` The identifier of the driver.
   * `WETHOOK_EVENT` The name of the event.
   * `WETHOOK_TARGET` The URL of the target resource that triggered the event.
